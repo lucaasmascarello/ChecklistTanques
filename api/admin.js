@@ -1,10 +1,7 @@
 const { Redis } = require("@upstash/redis");
 const { v4: uuidv4 } = require("uuid");
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-  token: process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN,
-});
+
 
 // Proteção simples por token de admin (defina ADMIN_TOKEN nas env vars)
 function isAuthorized(req) {
@@ -14,6 +11,10 @@ function isAuthorized(req) {
 }
 
 module.exports = async function handler(req, res) {
+  const redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
+    token: process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN,
+  });
   if (!isAuthorized(req)) {
     return res.status(401).json({ ok: false, erro: "não_autorizado" });
   }
