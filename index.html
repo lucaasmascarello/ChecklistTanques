@@ -1,0 +1,2503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espaçamento entre Costados de Tanques – Verificação Normativa</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#eef1f6; --surface:#ffffff; --surface2:#f4f6fa; --border:#dde1e9;
+  --accent:#c0392b; --accent-l:#fdf2f1; --accent-m:#f5c6c2;
+  --water:#1a73e8; --water-l:#e8f0fd;
+  --foam:#7b5ea7;  --foam-l:#f0ebfb;
+  --pump:#d35400;  --pump-l:#fdf0e8;
+  --green:#1e8449; --green-l:#eafaf1;
+  --warn:#b7950b;  --warn-l:#fef9e7;
+  --text:#1c2333;  --dim:#5f6b7c;
+  --sh:0 1px 3px rgba(0,0,0,.07),0 4px 14px rgba(0,0,0,.05);
+  --sh-sm:0 1px 3px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;font-size:13px;}
+
+/* ── HEADER ── */
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:54px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--sh-sm);position:sticky;top:0;z-index:100;}
+.htitle{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;}
+.hsub{font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
+.badge{border-radius:20px;padding:4px 13px;font-size:11px;font-family:'Share Tech Mono',monospace;font-weight:600;letter-spacing:.5px;}
+.b-norm{background:var(--water-l);border:1px solid #c5d9fb;color:var(--water);}
+.b-status{background:var(--accent-l);border:1px solid var(--accent-m);color:var(--accent);}
+.b-ok{background:var(--green-l);border:1px solid #a9dfbf;color:var(--green);}
+
+/* ── TABS ── */
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;}
+.tab{padding:10px 20px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;color:var(--dim);transition:all .15s;user-select:none;margin-bottom:-1px;}
+.tab:hover{color:var(--text);background:var(--surface2);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ── LAYOUT ── */
+.main{display:grid;grid-template-columns:320px 1fr;height:calc(100vh - 92px);}
+.left{background:var(--surface2);border-right:1px solid var(--border);overflow-y:auto;padding:14px 12px;}
+.right{background:var(--bg);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:10px;box-shadow:var(--sh-sm);}
+.card:last-child{margin-bottom:0;}
+.card-hd{padding:7px 13px;font-family:'Rajdhani',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:6px;}
+.card-hd.accent{color:var(--accent);background:var(--accent-l);}
+.card-hd.blue{color:var(--water);background:var(--water-l);}
+.card-hd.green{color:var(--green);background:var(--green-l);}
+.card-hd .dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.card-bd{padding:11px 13px;}
+
+/* ── FORM ROWS ── */
+.frow{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;margin-bottom:7px;}
+.frow:last-child{margin-bottom:0;}
+.flabel{font-size:11.5px;color:var(--dim);line-height:1.3;font-weight:500;}
+.fright{display:flex;align-items:center;gap:5px;}
+input.fi{background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12.5px;padding:4px 8px;width:88px;text-align:right;outline:none;transition:all .15s;}
+input.fi:hover{border-color:#aab4c4;}
+input.fi:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px var(--accent-l);}
+select.fi{background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:4px 6px;width:120px;outline:none;cursor:pointer;transition:all .15s;}
+select.fi:focus{border-color:var(--accent);}
+.funit{font-size:10px;color:var(--dim);font-family:'Share Tech Mono',monospace;min-width:28px;}
+
+/* ── TANK LIST ── */
+.tank-item{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .15s;}
+.tank-item:hover{border-color:#aab4c4;background:#f8faff;}
+.tank-item.selected{border-color:var(--accent);background:var(--accent-l);}
+.tank-tag{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:var(--text);min-width:54px;}
+.tank-info{flex:1;font-size:11px;color:var(--dim);}
+.tank-class{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;}
+.cls-I{background:#fdf2f1;color:#c0392b;border:1px solid #f5c6c2;}
+.cls-IB,.cls-IC,.cls-II{background:#fdf0e8;color:#d35400;border:1px solid #f0c8a8;}
+.cls-IIIA{background:#fef9e7;color:#b7950b;border:1px solid #f9e79f;}
+.cls-IIIB{background:#eafaf1;color:#1e8449;border:1px solid #a9dfbf;}
+.tank-diam{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim);}
+
+/* ── RESULTADO GRID ── */
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.rc{border-radius:7px;padding:9px 10px;text-align:center;border:1px solid var(--border);}
+.rc.w{background:var(--water-l);border-color:#c5d9fb;}
+.rc.g{background:var(--green-l);border-color:#a9dfbf;}
+.rc.a{background:var(--accent-l);border-color:var(--accent-m);grid-column:span 2;}
+.rc.full{grid-column:span 2;}
+.rl{font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;font-weight:600;}
+.rv{font-family:'Share Tech Mono',monospace;font-size:15px;font-weight:700;}
+.rc.w .rv{color:var(--water);}
+.rc.g .rv{color:var(--green);}
+.rc.a .rv{color:var(--accent);}
+.rs{font-size:9px;color:var(--dim);margin-top:2px;}
+
+/* ── TABELA PRINCIPAL ── */
+.tt{width:100%;border-collapse:collapse;font-size:12px;}
+.tt th{background:#2c3e50;padding:8px 11px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#ecf0f1;border-bottom:2px solid var(--border);font-weight:700;}
+.tt th.center{text-align:center;}
+.tt td{padding:7px 11px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
+.tt tr:last-child td{border-bottom:none;}
+.tt tr:hover td{background:#f0f4ff;}
+.tok{color:var(--green)!important;font-weight:700;}
+.twarn{color:var(--accent)!important;font-weight:700;}
+.tmono{font-family:'Share Tech Mono',monospace;}
+.tgray{color:var(--dim);}
+.tcenter{text-align:center;}
+
+/* ── ALERTAS ── */
+.alert{border-radius:6px;padding:9px 12px;font-size:11.5px;line-height:1.5;margin-top:0;}
+.alert.warn{background:var(--warn-l);border:1px solid #f9e79f;color:var(--warn);}
+.alert.info{background:var(--water-l);border:1px solid #c5d9fb;color:var(--water);}
+.alert.ok{background:var(--green-l);border:1px solid #a9dfbf;color:var(--green);}
+.alert.err{background:var(--accent-l);border:1px solid var(--accent-m);color:var(--accent);}
+
+/* ── BOTÕES ── */
+.btn{border:none;border-radius:20px;padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:#a93226;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-green:hover{background:#196f3d;}
+.btn-gray{background:#475569;color:#fff;}
+.btn-gray:hover{background:#334155;}
+.btn-add{width:100%;background:var(--water-l);border:1.5px dashed #90b8f5;color:var(--water);border-radius:6px;padding:7px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;cursor:pointer;text-align:center;transition:all .15s;margin-top:4px;}
+.btn-add:hover{background:#d4e5fd;border-color:var(--water);}
+
+/* ── FORMULA BOX ── */
+.fbox{background:#f7f7f7;border:1px solid #ddd;border-left:3px solid var(--water);padding:6px 10px;font-family:'Share Tech Mono',monospace;font-size:11px;border-radius:0 4px 4px 0;margin:4px 0;color:var(--text);}
+.norm-ref{font-size:11px;color:#444;border:1px solid #ccc;padding:5px 9px;border-radius:4px;background:#f9f9f9;margin:4px 0;line-height:1.5;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* ── TABPANEL ── */
+.tabpanel{display:none;}
+.tabpanel.active{display:block;}
+
+/* ── DELETE BTN ── */
+.del-btn{background:none;border:none;color:#ccc;cursor:pointer;font-size:14px;padding:2px 4px;border-radius:3px;transition:all .15s;}
+.del-btn:hover{color:var(--accent);background:var(--accent-l);}
+
+/* ── TAG INPUT ── */
+input.tag-input{background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;padding:4px 8px;width:70px;outline:none;transition:all .15s;}
+input.tag-input:focus{border-color:var(--accent);}
+
+/* ── STATUS PILL ── */
+.status-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;font-size:10px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.5px;}
+.pill-ok{background:var(--green-l);color:var(--green);border:1px solid #a9dfbf;}
+.pill-err{background:var(--accent-l);color:var(--accent);border:1px solid var(--accent-m);}
+.pill-warn{background:var(--warn-l);color:var(--warn);border:1px solid #f9e79f;}
+.pill-na{background:var(--surface2);color:var(--dim);border:1px solid var(--border);}
+
+/* ── PF READ-ONLY ── */
+input.pf-readonly{cursor:not-allowed!important;background:#f0f4f8!important;color:#8a98a8!important;border-color:#d0d8e4!important;}
+input.pf-readonly:focus{border-color:#d0d8e4!important;box-shadow:none!important;background:#f0f4f8!important;}
+#pf-lock-tip{transition:opacity .3s;}
+
+/* ── ADD LIQUID FORM ── */
+.add-liq-form{background:var(--surface);border:1.5px dashed #90b8f5;border-radius:8px;padding:12px 14px;margin-top:10px;}
+.add-liq-form.open{border-style:solid;border-color:var(--water);background:var(--water-l);}
+.add-liq-grid{display:grid;grid-template-columns:1fr 110px 130px 1fr auto;gap:8px;align-items:end;margin-top:10px;}
+.add-liq-label{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:3px;}
+.add-liq-preview{display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:11.5px;}
+.pf-class-badge{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px;display:inline-block;}
+.custom-liq-row td{background:#f0f8ff!important;}
+.custom-liq-row:hover td{background:#e0f0ff!important;}
+.btn-remove-custom{background:none;border:none;color:#ccc;cursor:pointer;font-size:13px;padding:1px 4px;border-radius:3px;transition:all .15s;vertical-align:middle;}
+.btn-remove-custom:hover{color:var(--accent);background:var(--accent-l);}
+
+/* ── SECTION DIVIDER ── */
+.sec-div{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);padding:6px 0 4px;margin-top:4px;border-top:1px solid var(--border);}
+
+/* ── TABELA NORMA ── */
+.norma-table{width:100%;border-collapse:collapse;font-size:11px;}
+.norma-table th{background:#2c3e50;color:#fff;padding:5px 8px;font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:.5px;text-transform:uppercase;}
+.norma-table td{padding:5px 8px;border-bottom:1px solid var(--border);font-family:'Share Tech Mono',monospace;}
+.norma-table tr:nth-child(even) td{background:var(--surface2);}
+.norma-table .hi{background:#fdf2f1!important;color:var(--accent);font-weight:700;}
+
+/* ── FOOTER ── */
+.footer{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#0a0f1a 0%,#0d1b2a 100%);border-top:1px solid rgba(255,255,255,0.07);padding:6px 20px;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Rajdhani',sans-serif;font-size:12px;letter-spacing:.4px;color:rgba(255,255,255,0.35);user-select:none;}
+.footer a{color:rgba(100,180,255,0.65);text-decoration:none;font-weight:700;letter-spacing:.6px;transition:color .2s;}
+.footer a:hover{color:rgba(100,180,255,1);}
+
+/* ══ MEMORIAL DE CÁLCULO ══ */
+.mem-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;overflow:hidden;}
+.mem-overlay.open{display:flex;flex-direction:row;align-items:stretch;}
+.mem-sidebar{width:268px;min-width:268px;background:#1c2333;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:0;}
+.mem-sidebar-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8fa3bf;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.1);}
+.mem-field-group{margin-bottom:10px;}
+.mem-field-label{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7a8fa6;margin-bottom:3px;}
+.mem-input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:4px;color:#e8ecf0;font-family:'Inter',sans-serif;font-size:11.5px;padding:5px 8px;outline:none;transition:border .15s;box-sizing:border-box;}
+.mem-input:focus{border-color:#1a73e8;background:rgba(26,115,232,.1);}
+.mem-input::placeholder{color:#4a5a6a;}
+.mem-textarea{resize:vertical;min-height:56px;line-height:1.4;}
+.mem-divider{border:none;border-top:1px solid rgba(255,255,255,.08);margin:10px 0 12px;}
+.mem-btn-update{width:100%;background:#1a73e8;border:none;color:#fff;padding:9px;border-radius:5px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;cursor:pointer;margin-top:6px;transition:background .15s;}
+.mem-btn-update:hover{background:#1557b0;}
+.mem-btn-print{width:100%;background:#1e8449;border:none;color:#fff;padding:9px;border-radius:5px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;cursor:pointer;margin-top:6px;transition:background .15s;}
+.mem-btn-print:hover{background:#196f3d;}
+.mem-doc{flex:1;overflow-y:auto;background:#b0b8c8;padding:24px 32px;display:flex;flex-direction:column;align-items:center;}
+.mem-close-bar{width:210mm;background:#1e8449;color:#fff;padding:8px 16px;display:flex;justify-content:space-between;align-items:center;font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:.5px;font-weight:700;border-radius:4px 4px 0 0;flex-shrink:0;}
+.mem-close-bar button{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;padding:4px 14px;border-radius:4px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;}
+.mem-close-bar button:hover{background:rgba(255,255,255,.35);}
+#mem-content{width:210mm;background:#fff;padding:16mm 18mm 20mm 20mm;font-family:'Times New Roman',Times,serif;font-size:10.5pt;color:#000;box-shadow:0 4px 24px rgba(0,0,0,.3);box-sizing:border-box;position:relative;}
+#mem-content .doc-topo{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;padding-bottom:10px;border-bottom:3px double #1c2333;}
+#mem-content .doc-logo-nome{font-size:13pt;font-weight:700;font-family:'Arial',sans-serif;color:#1c2333;letter-spacing:.3px;}
+#mem-content .doc-logo-sub{font-size:8.5pt;color:#555;font-family:'Arial',sans-serif;margin-top:2px;}
+#mem-content .doc-crea{font-size:8pt;color:#666;font-family:'Arial',sans-serif;margin-top:4px;}
+#mem-content .doc-num-area{text-align:right;font-family:'Arial',sans-serif;}
+#mem-content .doc-num{font-size:11pt;font-weight:700;color:#c0392b;}
+#mem-content .doc-rev{display:inline-block;background:#c0392b;color:#fff;font-size:8pt;font-weight:700;padding:1px 7px;border-radius:3px;margin-top:3px;}
+#mem-content h1{font-size:12pt;text-align:center;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:10px 0 2px;font-family:'Arial',sans-serif;}
+#mem-content .doc-subtitulo{text-align:center;font-size:9.5pt;color:#444;font-family:'Arial',sans-serif;margin-bottom:12px;}
+#mem-content .doc-ficha{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:8.5pt;font-family:'Arial',sans-serif;}
+#mem-content .doc-ficha td,.doc-ficha th{border:1px solid #888;padding:3.5px 6px;}
+#mem-content .doc-ficha th{background:#2c3e50;color:#fff;font-size:8pt;text-transform:uppercase;letter-spacing:.3px;font-weight:700;}
+#mem-content .doc-ficha .lbl{background:#f0f0f0;font-weight:700;color:#333;width:32%;}
+#mem-content h2{font-size:10.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin:16px 0 5px;border-left:4px solid #c0392b;padding-left:7px;font-family:'Arial',sans-serif;background:#fafafa;padding-top:3px;padding-bottom:3px;}
+#mem-content h3{font-size:10pt;font-weight:700;margin:10px 0 3px;font-family:'Arial',sans-serif;color:#1c2333;}
+#mem-content p,#mem-content li{margin:2px 0;font-size:10pt;line-height:1.5;}
+#mem-content ul{margin:4px 0 6px 18px;}
+#mem-content .formula{background:#f7f7f7;border:1px solid #ddd;border-left:3px solid #1a73e8;padding:4px 9px;font-family:'Courier New',monospace;font-size:9.5pt;margin:4px 0;border-radius:0 3px 3px 0;}
+#mem-content table.res-table{width:100%;border-collapse:collapse;margin:6px 0;font-size:8.5pt;font-family:'Arial',sans-serif;}
+#mem-content table.res-table th{background:#2c3e50;color:#fff;padding:4px 7px;text-align:left;font-size:8pt;letter-spacing:.2px;}
+#mem-content table.res-table td{border:1px solid #ccc;padding:3.5px 7px;}
+#mem-content table.res-table tr:nth-child(even) td{background:#f6f6f6;}
+#mem-content .res-val{font-family:'Courier New',monospace;font-weight:700;color:#c0392b;}
+#mem-content .norm-ref{font-size:8.5pt;color:#444;border:1px solid #ccc;padding:4px 8px;border-radius:3px;background:#f9f9f9;margin:6px 0;font-family:'Arial',sans-serif;}
+#mem-content .doc-obs{background:#fffbe6;border:1px solid #e6c700;border-radius:3px;padding:6px 10px;font-size:9pt;margin:8px 0;font-family:'Arial',sans-serif;}
+#mem-content .doc-obs strong{color:#856400;}
+#mem-content .doc-ok{background:#eafaf1;border:1px solid #a9dfbf;border-radius:3px;padding:5px 9px;font-size:9pt;margin:4px 0;font-family:'Arial',sans-serif;color:#1e5631;}
+#mem-content .doc-nok{background:#fdf2f1;border:1px solid #f5c6c2;border-radius:3px;padding:5px 9px;font-size:9pt;margin:4px 0;font-family:'Arial',sans-serif;color:#7b241c;}
+#mem-content .doc-assinatura{margin-top:28px;display:flex;justify-content:space-between;gap:20px;}
+#mem-content .doc-assin-bloco{flex:1;text-align:center;font-family:'Arial',sans-serif;font-size:9pt;}
+#mem-content .doc-assin-linha{border-top:1px solid #333;margin-bottom:4px;padding-top:4px;}
+#mem-content .doc-footer{border-top:1px solid #aaa;margin-top:16px;padding-top:5px;font-size:7.5pt;color:#666;display:flex;justify-content:space-between;font-family:'Arial',sans-serif;}
+#mem-content .watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:80pt;color:rgba(192,57,43,.04);font-weight:900;pointer-events:none;white-space:nowrap;user-select:none;font-family:'Arial',sans-serif;}
+#mem-content .status-ok{color:#1e8449;font-weight:700;}
+#mem-content .status-nok{color:#c0392b;font-weight:700;}
+#mem-content .status-nd{color:#888;}
+
+@media print{
+  @page{size:A4 portrait;margin:12mm 15mm 12mm 15mm;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  html,body{background:#fff!important;margin:0!important;padding:0!important;overflow:visible!important;}
+  body > *{display:none!important;}
+  .mem-overlay{display:block!important;position:static!important;background:none!important;padding:0!important;margin:0!important;width:100%!important;overflow:visible!important;}
+  .mem-sidebar{display:none!important;}
+  .mem-close-bar{display:none!important;}
+  .mem-doc{all:unset!important;display:block!important;width:100%!important;background:#fff!important;overflow:visible!important;}
+  #mem-content{all:unset!important;display:block!important;width:100%!important;font-family:'Times New Roman',Times,serif!important;font-size:10.5pt!important;color:#000!important;}
+  #mem-content .formula{background:#f7f7f7!important;border:1px solid #ddd!important;border-left:3px solid #1a73e8!important;}
+  #mem-content table.res-table th{background:#2c3e50!important;color:#fff!important;}
+  #mem-content .doc-ficha th{background:#2c3e50!important;color:#fff!important;}
+  #mem-content h2{background:#fafafa!important;}
+  #mem-content .doc-obs{background:#fffbe6!important;border:1px solid #e6c700!important;}
+  #mem-content .doc-ok{background:#eafaf1!important;border:1px solid #a9dfbf!important;}
+  #mem-content .doc-nok{background:#fdf2f1!important;border:1px solid #f5c6c2!important;}
+  .watermark{display:none!important;}
+  table{page-break-inside:auto;}
+  tr{page-break-inside:avoid;}
+  h2,h3{page-break-after:avoid;}
+}
+
+</style>
+
+<style id="license-styles">
+#lockScreen{
+  display:none;position:fixed;inset:0;z-index:99999;
+  background:linear-gradient(135deg,#0a0f1a 0%,#1c2333 60%,#0d1b2a 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Inter',sans-serif;
+}
+.lock-box{
+  background:#fff;border-radius:16px;padding:40px 36px 32px;
+  max-width:400px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,.4);
+  text-align:center;
+}
+.lock-logo{
+  font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:#c0392b;
+  margin-bottom:6px;
+}
+.lock-box h2{
+  font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;
+  color:#1c2333;margin:0 0 4px;letter-spacing:.5px;
+}
+.lock-subtitle{
+  font-size:11.5px;color:#8a9ab5;margin-bottom:28px;line-height:1.5;
+}
+.lock-box input{
+  width:100%;padding:13px 16px;border:1.5px solid #dde1e9;
+  border-radius:10px;font-size:15px;font-family:'Share Tech Mono',monospace;
+  letter-spacing:1.5px;margin-bottom:12px;box-sizing:border-box;
+  outline:none;text-align:center;transition:border .15s;
+}
+.lock-box input:focus{border-color:#c0392b;box-shadow:0 0 0 3px #fdf2f1;}
+.lock-box button{
+  width:100%;padding:13px;border:none;border-radius:10px;
+  background:#c0392b;color:#fff;font-size:15px;font-weight:700;
+  font-family:'Rajdhani',sans-serif;letter-spacing:.5px;cursor:pointer;
+  transition:background .15s;
+}
+.lock-box button:hover{background:#a93226;}
+.lock-box button:disabled{background:#ccc;cursor:default;}
+#lockError{color:#c0392b;margin-top:10px;font-size:13px;min-height:20px;line-height:1.4;}
+.lock-footer{margin-top:20px;font-size:10.5px;color:#b0b8c8;line-height:1.5;}
+</style>
+</head>
+<body>
+<div id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-logo">🔥 Mascarello Engenharia</div>
+    <h2>Checklist de Distanciamentos</h2>
+    <p class="lock-subtitle">Espaçamento entre Costados de Tanques · NBR 17505-2:2024<br>Digite sua chave de acesso para continuar.</p>
+    <input type="text" id="licenseKeyInput" placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" autocomplete="off" spellcheck="false">
+    <button id="unlockBtn">Acessar Ferramenta</button>
+    <div id="lockError"></div>
+    <div class="lock-footer">
+      Chave pessoal e intransferível.<br>
+      Suporte: <a href="mailto:lucasmascarello.eng@gmail.com" style="color:#8a9ab5;">lucasmascarello.eng@gmail.com</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ HEADER ══ -->
+<div class="hdr">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div>
+      <div class="htitle">Espaçamento entre Costados de Tanques</div>
+      <div class="hsub" id="hdr-sub">Checklist Normativo · ABNT NBR 17505-2:2024 · Tabela 2</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span class="badge b-norm" id="badge-norma">NBR 17505-2 – Tab. 2</span>
+    <span class="badge b-norm" id="badge-dist" style="display:none;">0 tanques c/ N/C</span>
+    <span class="badge b-status" id="badge-status">0 pares verificados</span>
+    <button id="btnLiberarLicenca" onclick="liberarLicenca()" style="background:#475569;color:#fff;border:none;border-radius:20px;padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;cursor:pointer;display:flex;align-items:center;gap:5px;" title="Libera a licença para uso em outro dispositivo">🔓 Liberar licença</button>
+    <button class="btn btn-green" onclick="salvarHTML()" title="Salvar como HTML">💾 Salvar HTML</button>
+  </div>
+</div>
+
+<!-- ══ TABS ══ -->
+<div class="tabs">
+  <div class="tab active" onclick="sw(this,'calc')">Verificação de Espaçamento</div>
+  <div class="tab" onclick="sw(this,'norma')">Tabela Normativa (Tab. 2.7)</div>
+  <div class="tab" onclick="sw(this,'distancias')">Dist. Limite / Vias / Edificações</div>
+  <div class="tab" onclick="sw(this,'dados')">Base de Dados</div>
+  <div class="tab" id="tab-mem" onclick="abrirMemorial()" style="margin-left:auto;color:var(--green);border-bottom-color:transparent;">📄 Memorial de Cálculo</div>
+</div>
+
+<div class="main">
+<!-- ══════════════ PAINEL ESQUERDO ══════════════ -->
+<div class="left">
+  <!-- ── NORMA DE REFERÊNCIA ── -->
+  <div class="card" id="card-norma">
+    <div class="card-hd" style="color:var(--foam);background:var(--foam-l);border-color:#d5c8f0;"><span class="dot"></span>Norma de Referência</div>
+    <div class="card-bd">
+      <div class="frow">
+        <span class="flabel">Norma aplicável</span>
+        <div class="fright">
+          <select id="norma-preset" onchange="onNormaPresetChange()" style="width:145px;background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;color:var(--text);font-family:'Inter',sans-serif;font-size:11px;padding:4px 6px;outline:none;cursor:pointer;" onfocus="this.style.borderColor='var(--foam)'" onblur="this.style.borderColor='var(--border)'">
+            <option value="nbr">ABNT NBR 17505-2</option>
+            <option value="it_sp">IT 25/2025 – SP</option>
+            <option value="ntcb_mt">NTCB 24/2020 – CBMMT/MT</option>
+            <option value="outro">Outra (digitar)</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow" id="norma-custom-row" style="display:none;">
+        <span class="flabel">Identificação</span>
+        <div class="fright">
+          <input id="norma-custom" class="fi" type="text" placeholder="Ex.: IT 34/2022 – BA" style="width:145px;text-align:left;font-size:11px;" oninput="onNormaCustomChange()">
+        </div>
+      </div>
+      <div id="norma-display" style="margin-top:6px;font-size:10px;font-family:'Share Tech Mono',monospace;color:var(--foam);background:var(--foam-l);border:1px solid #d5c8f0;border-radius:4px;padding:4px 8px;line-height:1.5;"></div>
+      <div id="norma-fonte-aviso" style="margin-top:5px;font-size:10px;color:var(--dim);line-height:1.4;">
+        ⚠ Os valores das tabelas desta ferramenta foram extraídos da IT 25/2025 (SP). Verifique se coincidem com a norma selecionada antes de emitir documentos técnicos.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TANQUES ── -->
+  <div class="card">
+    <div class="card-hd accent"><span class="dot"></span>Configuração dos Tanques</div>
+    <div class="card-bd">
+      <div class="sec-div">Tipo de Tanque</div>
+      <div class="frow" style="margin-top:6px;">
+        <span class="flabel" title="Norma de referência §18.2.2 – Tabela 2">Tipo de Teto ⓘ</span>
+        <div class="fright">
+          <select class="fi" id="tipo-teto" onchange="update()" style="width:145px;">
+            <option value="flutuante">Teto Flutuante/Selo</option>
+            <option value="fixo">Teto Fixo / Horizontal</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow" id="row-classe-liq">
+        <span class="flabel" title="Apenas para teto fixo/horizontal">Classe do Líquido ⓘ</span>
+        <div class="fright">
+          <select class="fi" id="classe-liq" onchange="update()" style="width:145px;">
+            <option value="I_II">Classe I ou II</option>
+            <option value="IIIA">Classe IIIA</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sec-div">Condição dos Tanques</div>
+      <div class="frow" style="margin-top:6px;">
+        <span class="flabel" title="Tabela 2.7 – tanques >45m têm critérios diferentes">Diâm. máx. do parque</span>
+        <div class="fright">
+          <select class="fi" id="faixa-diam" onchange="onFaixaManualChange()" style="width:145px;">
+            <option value="ate45">Todos ≤ 45 m</option>
+            <option value="gt45_dist">Algum > 45 m (bacia à distância)</option>
+            <option value="gt45_dique">Algum > 45 m (com dique)</option>
+          </select>
+        </div>
+      </div>
+      <div id="faixa-auto-msg" style="display:none;margin-top:5px;font-size:10.5px;border-radius:5px;padding:5px 9px;line-height:1.4;"></div>
+
+      <div id="formula-display" class="fbox" style="margin-top:8px;">D_min = 1/6 × (D₁ + D₂) ≥ 1,0 m</div>
+      <div class="norm-ref" id="norm-ref-box" style="margin-top:6px;">Ref.: Norma de referência – Tabela 2 (Espaçamento entre Costados)</div>
+    </div>
+  </div>
+
+  <!-- ── LISTA DE TANQUES ── -->
+  <div class="card">
+    <div class="card-hd blue"><span class="dot"></span>Tanques do Parque</div>
+    <div class="card-bd">
+      <div id="tank-list"></div>
+      <button class="btn-add" onclick="addTank()">＋ Adicionar Tanque</button>
+    </div>
+  </div>
+
+  <!-- ── RESULTADO RESUMO ── -->
+  <div class="card">
+    <div class="card-hd green"><span class="dot"></span>Resumo</div>
+    <div class="card-bd">
+      <div class="rg">
+        <div class="rc w"><div class="rl">Tanques</div><div class="rv" id="res-ntanques">0</div><div class="rs">cadastrados</div></div>
+        <div class="rc w"><div class="rl">Pares</div><div class="rv" id="res-npares">0</div><div class="rs">verificados</div></div>
+        <div class="rc g"><div class="rl">✔ Conformes</div><div class="rv" id="res-ok">0</div><div class="rs">pares</div></div>
+        <div class="rc a"><div class="rl">✘ Não conformes</div><div class="rv" id="res-nok">0</div><div class="rs">pares</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PAINEL DIREITO ══════════════ -->
+<div class="right">
+
+  <!-- TAB: VERIFICAÇÃO -->
+  <div class="tabpanel active" id="tp-calc">
+
+    <!-- ALERTA GERAL -->
+    <div id="alerta-geral" class="alert info" style="display:none;"></div>
+
+    <!-- TABELA DE PARES -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:var(--sh-sm);">
+      <div style="padding:8px 13px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">Verificação Par a Par – Costado a Costado</span>
+        <span style="font-size:10px;color:var(--dim);" id="panel-norma-ref">NBR 17505-2 · Tabela 2</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="tt" id="tabela-pares">
+          <thead>
+            <tr>
+              <th>TQ Principal</th>
+              <th>TQ Adjacente</th>
+              <th class="center">D₁ (m)</th>
+              <th class="center">D₂ (m)</th>
+              <th class="center">D₁+D₂ (m)</th>
+              <th class="center">Fração</th>
+              <th class="center">D_mín calc. (m)</th>
+              <th class="center">Dist. Real (m)</th>
+              <th class="center">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-pares">
+            <tr><td colspan="9" style="text-align:center;color:var(--dim);padding:20px;font-style:italic;">Cadastre ao menos 2 tanques para verificar os pares</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NOTA NORMATIVA -->
+    <div class="alert info">
+      <strong id="alert-norma-ref">📋 Tabela 2 – Espaçamento entre Costados:</strong> O espaçamento mínimo entre costados deve ser calculado para <em>cada par de tanques adjacentes</em>.
+      Para parques com mais de 2 tanques, a soma dos diâmetros é calculada para cada par possível (ex.: 4 tanques → pares 1-2, 1-3, 1-4, 2-3, 2-4, 3-4).
+    </div>
+
+    <!-- NOTAS ADICIONAIS -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:var(--sh-sm);">
+      <div class="card-hd"><span class="dot"></span>Observações Normativas Relevantes</div>
+      <div class="card-bd" style="display:flex;flex-direction:column;gap:8px;">
+        <div class="alert warn">
+          <strong>⚠ Líquidos instáveis ou com ebulição turbilhonar (§18.2.2e):</strong>
+          A distância entre um tanque com líquido instável (ou sujeito a boil-over) e qualquer outro tanque não pode ser inferior à metade da soma de seus diâmetros — independente da classe.
+        </div>
+        <div class="alert warn">
+          <strong>⚠ Tanques com GLP (§18.2.2g):</strong>
+          Distância mínima de <strong>6 m</strong> entre vasos/recipientes de GLP e qualquer tanque de armazenamento de líquidos de classe I, II ou IIIA.
+        </div>
+        <div class="alert info">
+          <strong>ℹ Instalações de produção isoladas (§18.2.2c):</strong>
+          Em instalações de produção isoladas, tanques de petróleo cru com capacidade individual ≤ 480.000 L, o espaçamento mínimo é <strong>1,0 m</strong> — Tabela 2.7 não se aplica.
+        </div>
+        <div class="alert info">
+          <strong>ℹ Líquidos IIIB (§18.2.2d):</strong>
+          Distância mínima entre tanques de classe IIIB é de <strong>1,0 m</strong>, desde que não estejam na mesma bacia com líquidos de classe I ou II. Neste caso, aplicar a Tabela 2.7 para classe IIIA.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAB: NORMA -->
+  <div class="tabpanel" id="tp-norma">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:var(--sh-sm);">
+      <div class="card-hd accent"><span class="dot"></span>Tabela 2.7 – Espaçamento Mínimo entre Tanques de Superfície (Costado a Costado)</div>
+      <div style="padding:12px 14px;font-size:11.5px;color:var(--dim);border-bottom:1px solid var(--border);">
+        Referência: <strong id="tab-norma-ref">NBR 17505-2 §18.2.2 – Tabela 2</strong>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="norma-table">
+          <thead>
+            <tr>
+              <th rowspan="2" style="vertical-align:middle;">Condição</th>
+              <th colspan="2">Tanques com Teto Flutuante ou Selo Flutuante</th>
+              <th colspan="2">Tanques Verticais Teto Fixo ou Horizontais – Liq. Classe I ou II</th>
+              <th colspan="2">Tanques Verticais Teto Fixo ou Horizontais – Liq. Classe IIIA</th>
+            </tr>
+            <tr>
+              <th>Fração</th><th>Mínimo</th>
+              <th>Fração</th><th>Mínimo</th>
+              <th>Fração</th><th>Mínimo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Todos os tanques com diâmetro ≤ 45 m</td>
+              <td class="tmono tcenter">1/6 × (D₁+D₂)</td><td class="tmono tcenter">1,0 m</td>
+              <td class="tmono tcenter">1/6 × (D₁+D₂)</td><td class="tmono tcenter">1,0 m</td>
+              <td class="tmono tcenter">1/6 × (D₁+D₂)</td><td class="tmono tcenter">1,0 m</td>
+            </tr>
+            <tr>
+              <td>Algum tanque com diâmetro > 45 m – Bacia de contenção <em>à distância</em></td>
+              <td class="tmono tcenter">1/6 × (D₁+D₂)</td><td class="tmono tcenter">–</td>
+              <td class="tmono tcenter hi">1/4 × (D₁+D₂)</td><td class="tmono tcenter hi">–</td>
+              <td class="tmono tcenter">1/6 × (D₁+D₂)</td><td class="tmono tcenter">–</td>
+            </tr>
+            <tr>
+              <td>Algum tanque com diâmetro > 45 m – Com <em>dique</em></td>
+              <td class="tmono tcenter">1/4 × (D₁+D₂)</td><td class="tmono tcenter">–</td>
+              <td class="tmono tcenter hi">1/3 × (D₁+D₂)</td><td class="tmono tcenter hi">–</td>
+              <td class="tmono tcenter">1/4 × (D₁+D₂)</td><td class="tmono tcenter">–</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="padding:10px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--dim);line-height:1.6;">
+        <strong>Nota:</strong> "Soma dos diâmetros dos tanques adjacentes" significa a soma dos diâmetros de <em>cada par</em> de tanques adjacentes uns aos outros.<br>
+        <strong>Onde houver mais de 2 tanques,</strong> a soma dos diâmetros deve ser calculada para cada par possível. Exemplo: 4 tanques numerados 1-4 → verificar pares: 1e2, 1e3, 1e4, 2e3, 2e4, 3e4.
+      </div>
+    </div>
+
+    <!-- Tabela de classes de líquidos -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:var(--sh-sm);">
+      <div class="card-hd blue"><span class="dot"></span>Classificação de Líquidos – ABNT NBR 17505-1</div>
+      <div style="overflow-x:auto;">
+        <table class="norma-table">
+          <thead>
+            <tr>
+              <th>Classe</th>
+              <th>Ponto de Fulgor</th>
+              <th>Ponto de Ebulição</th>
+              <th>Exemplos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="tank-class cls-I">Classe IA</span></td><td class="tmono">&lt; 23°C</td><td class="tmono">&lt; 38°C</td><td>Éter etílico, hexano</td></tr>
+            <tr><td><span class="tank-class cls-I">Classe IB</span></td><td class="tmono">&lt; 23°C</td><td class="tmono">≥ 38°C</td><td>Gasolina, benzeno, acetona</td></tr>
+            <tr><td><span class="tank-class cls-I">Classe IC</span></td><td class="tmono">23°C a &lt; 38°C</td><td class="tmono">–</td><td>Etanol, metanol</td></tr>
+            <tr><td><span class="tank-class cls-II">Classe II</span></td><td class="tmono">38°C a &lt; 60°C</td><td class="tmono">–</td><td>Diesel, querosene</td></tr>
+            <tr><td><span class="tank-class cls-IIIA">Classe IIIA</span></td><td class="tmono">60°C a &lt; 93°C</td><td class="tmono">–</td><td>Óleo lubrificante leve</td></tr>
+            <tr><td><span class="tank-class cls-IIIB">Classe IIIB</span></td><td class="tmono">≥ 93°C</td><td class="tmono">–</td><td>Biodiesel, óleo vegetal</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="padding:8px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--dim);">
+        <strong>Nota NBR 17505-1 §17.1.1:</strong> Líquidos de classe II e III aquecidos a temperaturas ≥ ao ponto de fulgor devem seguir os requisitos para líquidos de classe I.
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: BASE DE DADOS -->
+  <div class="tabpanel" id="tp-dados">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:var(--sh-sm);">
+      <div class="card-hd accent" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:6px;"><span class="dot"></span>Banco de Líquidos – Ponto de Fulgor e Classificação</div>
+        <span style="font-size:10px;color:var(--dim);" id="dados-count-label"></span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="tt">
+          <thead>
+            <tr>
+              <th>Líquido</th>
+              <th class="center">Ponto de Fulgor (°C)</th>
+              <th class="center">Classe NBR 17505-1</th>
+              <th>Observação</th>
+              <th class="center" style="width:32px;"></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-dados"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FORMULÁRIO ADICIONAR LÍQUIDO CUSTOMIZADO -->
+    <div class="add-liq-form" id="add-liq-form">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--water);">＋ Adicionar Líquido à Base de Dados</span>
+          <span style="font-size:10px;color:var(--dim);">Líquido não encontrado na lista? Cadastre abaixo.</span>
+        </div>
+        <button onclick="toggleAddLiqForm()" id="btn-toggle-add-liq"
+          style="background:var(--water);color:#fff;border:none;border-radius:20px;padding:4px 14px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;cursor:pointer;">
+          Expandir
+        </button>
+      </div>
+
+      <div id="add-liq-fields" style="display:none;">
+        <div class="add-liq-grid">
+          <div>
+            <div class="add-liq-label">Nome do Líquido *</div>
+            <input id="new-liq-nome" class="fi" type="text" placeholder="Ex.: Nafta, Acetato de Etila…"
+              style="width:100%;text-align:left;"
+              oninput="onNewLiqChange()" maxlength="40">
+          </div>
+          <div>
+            <div class="add-liq-label">Ponto de Fulgor (°C) *</div>
+            <input id="new-liq-pf" class="fi" type="number" step="1" placeholder="Ex.: 28"
+              style="width:100%;"
+              oninput="onNewLiqChange()">
+          </div>
+          <div>
+            <div class="add-liq-label">Classe (auto-detectada)</div>
+            <div id="new-liq-classe-preview" style="height:30px;display:flex;align-items:center;padding:0 8px;background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--dim);">
+              Informe o PF →
+            </div>
+          </div>
+          <div>
+            <div class="add-liq-label">Observação (opcional)</div>
+            <input id="new-liq-obs" class="fi" type="text" placeholder="Ex.: FISPQ ref. XY-001"
+              style="width:100%;text-align:left;" maxlength="60">
+          </div>
+          <div style="padding-bottom:1px;">
+            <button onclick="adicionarLiquidoCustom()"
+              style="background:var(--water);color:#fff;border:none;border-radius:6px;padding:7px 16px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;cursor:pointer;white-space:nowrap;height:30px;display:flex;align-items:center;">
+              ＋ Incluir
+            </button>
+          </div>
+        </div>
+
+        <div id="new-liq-preview" style="display:none;" class="add-liq-preview">
+          <span style="color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;">Preview:</span>
+          <strong id="prev-nome" style="font-size:12.5px;"></strong>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim);">PF: <span id="prev-pf"></span>°C</span>
+          <span id="prev-classe-badge" class="tank-class"></span>
+          <span id="prev-obs" style="font-size:11px;color:var(--dim);font-style:italic;"></span>
+        </div>
+
+        <div id="new-liq-erro" style="display:none;margin-top:8px;" class="alert err"></div>
+        <div id="new-liq-sucesso" style="display:none;margin-top:8px;" class="alert ok"></div>
+
+        <div style="margin-top:10px;padding:8px 10px;background:var(--warn-l);border:1px solid #f9e79f;border-radius:5px;font-size:10.5px;color:var(--warn);line-height:1.5;">
+          ⚠ <strong>Atenção:</strong> A classe é determinada automaticamente pelo ponto de fulgor (NBR 17505-1). Sempre confirme o valor real com a <strong>FISPQ</strong> do produto. Líquidos customizados ficam salvos apenas nesta sessão do navegador.
+        </div>
+      </div>
+    </div>
+
+    <div class="alert info">
+      <strong>ℹ Fonte:</strong> Dados baseados em valores típicos de literatura técnica e NBR 17505-1. Sempre confirme o ponto de fulgor real com a FISPQ do produto utilizado.
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:9px 13px;font-size:11.5px;color:var(--dim);line-height:1.6;display:flex;align-items:flex-start;gap:8px;">
+      <span style="font-size:14px;flex-shrink:0;">🔒</span>
+      <span>
+        <strong style="color:var(--text);">Pontos de Fulgor fixados:</strong>
+        Os PFs dos líquidos da base padrão são <strong>somente leitura</strong> nos painéis de tanques — o projetista não pode alterá-los acidentalmente.
+        Líquidos <span style="background:#e0f0ff;color:#1a73e8;border:1px solid #c5d9fb;border-radius:3px;padding:0 4px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:10px;">CUSTOM</span>
+        têm o campo PF <span style="background:#fff8e1;border:1px solid #f9e79f;border-radius:3px;padding:0 4px;font-family:'Share Tech Mono',monospace;font-size:10px;">✏️ editável</span>
+        diretamente nesta tabela. A classe é recalculada automaticamente e propagada para todos os tanques que usam o líquido.
+      </span>
+    </div>
+  </div><!-- #tp-dados -->
+
+
+  <!-- TAB: DISTÂNCIAS LIMITE/VIAS/EDIFICAÇÕES -->
+  <div class="tabpanel" id="tp-distancias">
+
+    <!-- Cabeçalho informativo -->
+    <div class="alert info" id="dist-info-msg">
+      <strong>ℹ NBR 17505-2 §18.2.1 + Tabelas 2.1, 2.2 e 2.6:</strong>
+      Todos os tanques de superfície devem respeitar distâncias mínimas até o <strong>limite de propriedade</strong>,
+      <strong>vias de circulação internas</strong> e <strong>edificações na mesma propriedade</strong>.
+      Os dados dos tanques são importados automaticamente do painel esquerdo.
+    </div>
+
+    <!-- Configuração global da aba -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:var(--sh-sm);">
+      <div class="card-hd accent"><span class="dot"></span>Parâmetros Globais – Distâncias</div>
+      <div class="card-bd">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+          <div>
+            <div class="sec-div" id="dist-cb-label" style="border:none;padding-top:0;margin-top:0;">Cobertura por Corpo de Bombeiros</div>
+            <div style="margin-top:5px;">
+              <select id="dist-cbpmesp" onchange="renderDistancias()"
+                style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;
+                       color:var(--text);font-family:'Inter',sans-serif;font-size:12px;padding:5px 8px;outline:none;cursor:pointer;"
+                onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+                <option value="com" id="dist-cb-opt-com">Com Corpo de Bombeiros ou OCM</option>
+                <option value="sem" id="dist-cb-opt-sem">Sem Corpo de Bombeiros e sem OCM</option>
+              </select>
+              <div style="font-size:10px;color:var(--dim);margin-top:4px;line-height:1.4;">Sem cobertura → distâncias dobradas (máx. 90 m)</div>
+            </div>
+          </div>
+          <div>
+            <div class="sec-div" style="border:none;padding-top:0;margin-top:0;">Tipo de Teto (para Tab. 2.1)</div>
+            <div style="margin-top:5px;">
+              <select id="dist-tipo-teto" onchange="renderDistancias()"
+                style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;
+                       color:var(--text);font-family:'Inter',sans-serif;font-size:12px;padding:5px 8px;outline:none;cursor:pointer;"
+                onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+                <option value="flutuante">Teto Flutuante / Selo Flutuante</option>
+                <option value="fragilizado">Teto Fixo – Solda Fragilizada</option>
+                <option value="fixo_espuma">Teto Fixo – c/ espuma ou inertização</option>
+                <option value="fixo_sem">Teto Fixo – sem espuma/inertização</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <div class="sec-div" style="border:none;padding-top:0;margin-top:0;">Pressão Operação</div>
+            <div style="margin-top:5px;">
+              <select id="dist-pressao" onchange="renderDistancias()"
+                style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;
+                       color:var(--text);font-family:'Inter',sans-serif;font-size:12px;padding:5px 8px;outline:none;cursor:pointer;"
+                onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+                <option value="ate17">≤ 17 kPa (Tab. 2.1 / 2.6)</option>
+                <option value="gt17">> 17 kPa (Tab. 2.3)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela principal de verificação -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:var(--sh-sm);">
+      <div style="padding:8px 13px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">Verificação por Tanque – Distâncias ao Entorno</span>
+        <span style="font-size:10px;color:var(--dim);" id="panel-norma-dist">NBR 17505-2 · Tabelas 2.1, 2.2, 2.6</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="tt" id="tabela-distancias">
+          <thead>
+            <tr>
+              <th rowspan="2" style="vertical-align:middle;">Tanque</th>
+              <th rowspan="2" class="center" style="vertical-align:middle;">Líquido / Classe</th>
+              <th rowspan="2" class="center" style="vertical-align:middle;">Ø (m)</th>
+              <th rowspan="2" class="center" style="vertical-align:middle;">Cap. (m³)</th>
+              <th colspan="3" class="center" style="border-left:2px solid #3d5166;background:#253545;color:#90b4d0;">Limite de Propriedade (m)</th>
+              <th colspan="3" class="center" style="border-left:2px solid #3d5166;background:#253545;color:#c8b8e8;">Vias Internas / Edificações (m)</th>
+            </tr>
+            <tr>
+              <th class="center" style="border-left:2px solid #3d5166;font-size:10px;">D_mín calc.</th>
+              <th class="center" style="font-size:10px;">Dist. Real</th>
+              <th class="center" style="font-size:10px;">Status</th>
+              <th class="center" style="border-left:2px solid #3d5166;font-size:10px;">D_mín calc.</th>
+              <th class="center" style="font-size:10px;">Dist. Real</th>
+              <th class="center" style="font-size:10px;">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-distancias">
+            <tr><td colspan="10" style="text-align:center;color:var(--dim);padding:20px;font-style:italic;">Cadastre tanques no painel esquerdo</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Resumo distâncias -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:var(--sh-sm);">
+      <div class="card-hd green"><span class="dot"></span>Resumo – Distâncias ao Entorno</div>
+      <div class="card-bd">
+        <div class="rg">
+          <div class="rc w"><div class="rl">Tanques analisados</div><div class="rv" id="dist-res-n">0</div></div>
+          <div class="rc g"><div class="rl">✔ Todos conformes</div><div class="rv" id="dist-res-ok">0</div></div>
+          <div class="rc a"><div class="rl">✘ Com inconformidade</div><div class="rv" id="dist-res-nok">0</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notas normativas -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:var(--sh-sm);">
+      <div class="card-hd"><span class="dot"></span>Referências Normativas – <span id="hd-norma-ref">ABNT NBR 17505-2</span></div>
+      <div class="card-bd" style="display:flex;flex-direction:column;gap:8px;">
+        <div class="alert info">
+          <strong>Tabela 2.1 (§18.2.1a/b/c):</strong> Tanques cl. I, II ou IIIA com P ≤ 17 kPa.
+          Distância ao limite de propriedade baseada no diâmetro e tipo de teto/proteção.
+          Distância mínima absoluta: <strong>1,5 m</strong>.
+        </div>
+        <div class="alert info">
+          <strong>Tabela 2.2 (referência):</strong> Tabela auxiliar de distâncias por faixa de capacidade volumétrica,
+          usada nas Tabelas 2.1, 2.3 e 2.5.
+        </div>
+        <div class="alert info">
+          <strong>Tabela 2.6 (§18.2.1f):</strong> Tanques de líquidos cl. IIIB. Distâncias menores que as de cl. I/II,
+          exceto se estiverem na mesma bacia com tanques cl. I ou II.
+        </div>
+        <div class="alert warn">
+          <strong>⚠ Propriedade adjacente similar (§18.2.1g):</strong> Com consentimento por escrito de ambos os proprietários,
+          podem ser adotadas <strong>metade</strong> das distâncias mínimas da Tabela 2.1.
+        </div>
+        <div class="alert warn">
+          <span id="alert-warn-cb"><strong>⚠ Sem Corpo de Bombeiros / OCM (norma de referência – Tab. 2.1/2.2 notas):</strong></span> Dobrar todas as distâncias calculadas, limitado a 90 m.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- #tp-distancias -->
+
+</div><!-- .right -->
+</div><!-- .main -->
+
+<!-- ══ FOOTER ══ -->
+<div class="footer">
+  <span style="color:rgba(255,255,255,0.18);">◆</span>
+  <span>Desenvolvido por</span>
+  <a href="https://www.linkedin.com/in/lucasmascarello1" target="_blank" rel="noopener">Lucas Mascarello</a>
+  <span style="color:rgba(255,255,255,0.18);">·</span>
+  <span style="font-size:11px;color:rgba(255,255,255,0.2);" id="footer-norma-2">NBR 17505-2 · Tabela 2</span>
+</div>
+
+<script>
+
+
+
+// NORMA DE REFERÊNCIA CONFIGURÁVEL
+// ══════════════════════════════════════════
+const NORMAS_PRESET = {
+  nbr:    { label:"ABNT NBR 17505-2:2024",     short:"NBR 17505-2",    aviso:false },
+  it_sp:  { label:"IT 25/2025 – CBPMESP/SP",   short:"IT 25/2025 SP",  aviso:true  },
+  it_rj:  { label:"IT 25 – CBMERJ/RJ",       short:"IT 25 RJ",       aviso:true  },
+  it_mg:  { label:"IT 25 – CBMMG/MG",        short:"IT 25 MG",       aviso:true  },
+  it_rs:  { label:"RT 25 – CBMRS/RS",        short:"RT 25 RS",       aviso:true  },
+  it_pr:  { label:"NPT 25 – CBMPR/PR",       short:"NPT 25 PR",      aviso:true  },
+  it_sc:  { label:"IN 25 – CBMSC/SC",        short:"IN 25 SC",       aviso:true  },
+  ntcb_mt:{ label:"NTCB 24/2020 – CBMMT/MT",  short:"NTCB 24/MT",     aviso:false },
+  outro:  { label:"",                           short:"",               aviso:true  },
+};
+
+// Estado global da norma selecionada
+let normaSelecionada = { label:"ABNT NBR 17505-2:2024", short:"NBR 17505-2", aviso:false };
+
+function getNormaLabel()  { return normaSelecionada.label  || "—"; }
+function getNormaShort()  { return normaSelecionada.short  || "—"; }
+function getNormaAviso()  { return normaSelecionada.aviso; }
+
+function onNormaPresetChange(){
+  const sel = document.getElementById("norma-preset").value;
+  const rowCustom = document.getElementById("norma-custom-row");
+  rowCustom.style.display = sel === "outro" ? "grid" : "none";
+  if(sel !== "outro"){
+    const preset = NORMAS_PRESET[sel];
+    normaSelecionada = { label: preset.label, short: preset.short, aviso: preset.aviso };
+  } else {
+    onNormaCustomChange();
+  }
+  atualizarDisplayNorma();
+  renderAll();
+  renderDistancias();
+}
+
+function onNormaCustomChange(){
+  const val = (document.getElementById("norma-custom").value || "").trim();
+  normaSelecionada = { label: val || "Norma não especificada", short: val || "—", aviso: true };
+  atualizarDisplayNorma();
+  renderAll();
+  renderDistancias();
+}
+
+function atualizarDisplayNorma(){
+  const label  = getNormaLabel();
+  const aviso  = getNormaAviso();
+  const dispEl = document.getElementById("norma-display");
+  if(dispEl) dispEl.textContent = label;
+
+  // Badge e subtítulo do header
+  const badgeEl = document.getElementById("badge-norma");
+  if(badgeEl) badgeEl.textContent = getNormaShort() + " – Tab. 2";
+
+  const subEl = document.getElementById("hdr-sub");
+  if(subEl) subEl.textContent = "Checklist Normativo · " + label + " · Tabela 2";
+
+  const normRefEl = document.getElementById("norm-ref-box");
+  if(normRefEl) normRefEl.textContent = "Ref.: " + label + " – Tabela 2 (Espaçamento entre Costados)";
+
+  const footerEl = document.getElementById("footer-norma");
+  if(footerEl) footerEl.textContent = label + " · Tabela 2";
+
+  const panelRef = document.getElementById("panel-norma-ref");
+  if(panelRef) panelRef.textContent = getNormaShort() + " · Tabela 2";
+
+  const panelDist = document.getElementById("panel-norma-dist");
+  if(panelDist) panelDist.textContent = getNormaShort() + " · Tabelas 2.1, 2.2, 2.6";
+
+  const footer2 = document.getElementById("footer-norma-2");
+  if(footer2) footer2.textContent = getNormaShort() + " · Tabela 2";
+
+  // Adaptar terminologia OCM ↔ PAM conforme norma
+  const isNTCBmtUI = document.getElementById("norma-preset")?.value === "ntcb_mt";
+  const cbLabel = document.getElementById("dist-cb-label");
+  if(cbLabel) cbLabel.textContent = isNTCBmtUI ? "Cobertura por Corpo de Bombeiros" : "Cobertura por Corpo de Bombeiros";
+  const optCom = document.getElementById("dist-cb-opt-com");
+  if(optCom) optCom.textContent = isNTCBmtUI ? "Com Corpo de Bombeiros ou Plano de Auxílio Mútuo" : "Com Corpo de Bombeiros ou OCM";
+  const optSem = document.getElementById("dist-cb-opt-sem");
+  if(optSem) optSem.textContent = isNTCBmtUI ? "Sem Corpo de Bombeiros Militar local / PAM" : "Sem Corpo de Bombeiros e sem OCM";
+
+  // Atualizar alerta de norma de referência nos alertas das seções
+  const alertNormaRef2 = document.getElementById("alert-norma-ref");
+  if(alertNormaRef2){
+    alertNormaRef2.textContent = "📋 " + (isNTCBmtUI ? "NTCB 24/2020 §2.3.2.2 – Tab. 2.7:" : getNormaShort() + " – Tabela 2:");
+  }
+
+  // Atualizar nota normativa da aba de distâncias
+  const distInfoMsg = document.getElementById("dist-info-msg");
+  if(distInfoMsg){
+    if(isNTCBmtUI){
+      distInfoMsg.innerHTML = "<strong>ℹ NTCB 24/2020 §2.3.2.1 + Tabelas 2.1, 2.2 e 2.6 (CBMMT/MT):</strong> Todos os tanques de superfície devem respeitar afastamentos mínimos até o <strong>limite de propriedade</strong>, <strong>vias de circulação internas</strong> e <strong>edificações na mesma propriedade</strong>. Os dados dos tanques são importados automaticamente do painel esquerdo.";
+    } else {
+      distInfoMsg.innerHTML = "<strong>ℹ " + getNormaShort() + " §18.2.1 + Tabelas 2.1, 2.2 e 2.6:</strong> Todos os tanques de superfície devem respeitar distâncias mínimas até o <strong>limite de propriedade</strong>, <strong>vias de circulação internas</strong> e <strong>edificações na mesma propriedade</strong>. Os dados dos tanques são importados automaticamente do painel esquerdo.";
+    }
+  }
+
+  // Atualizar alertas das notas normativas NTCB x IT
+  const alertWarnCB = document.getElementById("alert-warn-cb");
+  if(alertWarnCB){
+    alertWarnCB.innerHTML = isNTCBmtUI
+      ? "<strong>⚠ Sem Corpo de Bombeiros Militar local / PAM (NTCB 24/2020 Tab. 2.1 Nota 2):</strong> Dobrar todas as distâncias calculadas, limitado a 90 m."
+      : '<span id="alert-warn-cb"><strong>⚠ Sem Corpo de Bombeiros / OCM (norma de referência – Tab. 2.1/2.2 notas):</strong></span> Dobrar todas as distâncias calculadas, limitado a 90 m.';
+  }
+
+  const tabRef = document.getElementById("tab-norma-ref");
+  if(tabRef) tabRef.textContent = getNormaShort() + " §18.2.2 – Tabela 2";
+
+  const hdRef = document.getElementById("hd-norma-ref");
+  if(hdRef) hdRef.textContent = label;
+
+  const alertRef = document.getElementById("alert-norma-ref");
+  if(alertRef) alertRef.textContent = "📋 " + getNormaShort() + " – Tabela 2:";
+
+  // Aviso visual no card dependendo da norma selecionada
+  const cardNorma = document.getElementById("card-norma");
+  const preset = document.getElementById("norma-preset").value;
+  const fonteEl = document.getElementById("norma-fonte-aviso");
+
+  // Aviso de fonte — única mensagem, sem duplicação
+  if(fonteEl){
+    if(preset === "ntcb_mt"){
+      fonteEl.style.cssText = "margin-top:5px;font-size:10px;color:var(--green);line-height:1.4;";
+      fonteEl.innerHTML = "✔ <strong>Tabelas verificadas:</strong> Valores das Tabelas 2.1, 2.2, 2.6 e 2.7 da NTCB 24/2020 (CBMMT/MT) conferidos e idênticos aos desta ferramenta.";
+    } else if(!aviso){
+      fonteEl.style.cssText = "margin-top:5px;font-size:10px;color:var(--dim);line-height:1.4;";
+      fonteEl.innerHTML = "ℹ Valores baseados na IT 25/2025 (SP). Confirme a equivalência com a norma selecionada.";
+    } else {
+      fonteEl.style.cssText = "margin-top:5px;font-size:10px;color:var(--warn);line-height:1.4;";
+      fonteEl.innerHTML = "⚠ Valores baseados na IT 25/2025 (SP). Confirme a equivalência com a norma selecionada antes de emitir documentos.";
+    }
+  }
+
+  // Remove qualquer .norma-aviso-box dinâmico que possa existir de versão anterior
+  if(cardNorma){
+    const avEl = cardNorma.querySelector(".norma-aviso-box");
+    if(avEl) avEl.remove();
+  }
+
+
+
+}
+// BASE DE DADOS
+// ══════════════════════════════════════════
+const LIQUIDOS_DB = [
+  { nome:"Benzeno",       pf:-11,  classe:"IB",   obs:"Cancerígeno – atenção especial" },
+  { nome:"Biodiesel",     pf:130,  classe:"IIIB",  obs:"B100; pode variar conforme mistura" },
+  { nome:"Diesel",        pf:52,   classe:"II",    obs:"Diesel S-10 / S-500" },
+  { nome:"Etanol",        pf:13,   classe:"IC",    obs:"Álcool etílico hidratado ou anidro" },
+  { nome:"Éter Etílico",  pf:-45,  classe:"IA",    obs:"Extremamente inflamável" },
+  { nome:"Gasolina",      pf:-40,  classe:"IB",    obs:"Varia conforme composição" },
+  { nome:"Glicerina",     pf:160,  classe:"IIIB",  obs:"Subproduto do biodiesel" },
+  { nome:"Hexano",        pf:-22,  classe:"IB",    obs:"Solvente industrial" },
+  { nome:"Metanol",       pf:11,   classe:"IC",    obs:"Álcool metílico" },
+  { nome:"Óleo Vegetal",  pf:254,  classe:"IIIB",  obs:"Bruto ou refinado" },
+  { nome:"Querosene",     pf:38,   classe:"II",    obs:"JA-1, JA-4; varia conforme norma" },
+  { nome:"Tolueno",       pf:4,    classe:"IB",    obs:"Solvente aromático" },
+  { nome:"Xileno",        pf:27,   classe:"IC",    obs:"Solvente aromático" },
+  { nome:"Acetona",       pf:-18,  classe:"IB",    obs:"Solvente polar" },
+  { nome:"Óleo Lubrif.",  pf:200,  classe:"IIIB",  obs:"Varia conforme viscosidade/grau" },
+];
+
+// Mapa classe → CSS
+const CLASSE_CSS = {
+  "IA":"cls-I","IB":"cls-I","IC":"cls-I","I":"cls-I",
+  "II":"cls-IB","IIIA":"cls-IIIA","IIIB":"cls-IIIB"
+};
+function clsLabel(c){
+  if(c==="IA"||c==="IB"||c==="IC") return "I";
+  return c;
+}
+
+// ══════════════════════════════════════════
+
+// ESTADO
+// ══════════════════════════════════════════
+let tanks = [
+  { tag:"T-001", liquido:"Etanol",   diam:35, pf:13,  classe:"IC", distReal:{} },
+  { tag:"T-002", liquido:"Biodiesel",diam:40, pf:130, classe:"IIIB", distReal:{} },
+  { tag:"T-003", liquido:"Metanol",  diam:45, pf:11,  classe:"IC", distReal:{} },
+  { tag:"T-004", liquido:"Óleo Vegetal",diam:50, pf:254, classe:"IIIB", distReal:{} },
+];
+
+let tankCounter = 5;
+
+// ══════════════════════════════════════════
+
+// CLASSIFICAÇÃO PELO PONTO DE FULGOR
+// ══════════════════════════════════════════
+function classificar(pf){
+  if(pf < 23) return "I";     // IA, IB ou IC → simplificado como I para Tab. 2.7
+  if(pf < 60) return "II";
+  if(pf < 93) return "IIIA";
+  return "IIIB";
+}
+function classificarDetalhado(pf){
+  if(pf < 23 && pf < -20) return "IA";
+  if(pf < 23 && pf >= -20) return "IB";
+  if(pf >= 23 && pf < 38) return "IC";
+  if(pf >= 38 && pf < 60) return "II";
+  if(pf >= 60 && pf < 93) return "IIIA";
+  return "IIIB";
+}
+
+// ══════════════════════════════════════════
+
+// FRAÇÕES TABELA 2.7
+// ══════════════════════════════════════════
+function getFracao(tipoTeto, classeLiq, faixaDiam){
+  // tipoTeto: 'flutuante' | 'fixo'
+  // classeLiq: 'I_II' | 'IIIA'
+  // faixaDiam: 'ate45' | 'gt45_dist' | 'gt45_dique'
+  if(tipoTeto === "flutuante"){
+    if(faixaDiam === "ate45")      return { frac:1/6, label:"1/6", min:1.0 };
+    if(faixaDiam === "gt45_dist")  return { frac:1/6, label:"1/6", min:0 };
+    if(faixaDiam === "gt45_dique") return { frac:1/4, label:"1/4", min:0 };
+  } else {
+    // fixo ou horizontal
+    if(classeLiq === "I_II"){
+      if(faixaDiam === "ate45")      return { frac:1/6, label:"1/6", min:1.0 };
+      if(faixaDiam === "gt45_dist")  return { frac:1/4, label:"1/4", min:0 };
+      if(faixaDiam === "gt45_dique") return { frac:1/3, label:"1/3", min:0 };
+    } else { // IIIA
+      if(faixaDiam === "ate45")      return { frac:1/6, label:"1/6", min:1.0 };
+      if(faixaDiam === "gt45_dist")  return { frac:1/6, label:"1/6", min:0 };
+      if(faixaDiam === "gt45_dique") return { frac:1/4, label:"1/4", min:0 };
+    }
+  }
+  return { frac:1/6, label:"1/6", min:1.0 };
+}
+
+// ══════════════════════════════════════════
+
+// RENDER TANK LIST
+// ══════════════════════════════════════════
+function buildLiquidOptions(selectedNome){
+  const base   = LIQUIDOS_DB.filter(l => !l.custom);
+  const custom = LIQUIDOS_DB.filter(l =>  l.custom);
+  let html = base.map(l => {
+    const sel = l.nome === selectedNome ? " selected" : "";
+    return `<option value="${l.nome}"${sel}>${l.nome} (PF: ${l.pf > 0 ? '+'+l.pf : l.pf}\xB0C \xB7 Cl.${l.classe})</option>`;
+  }).join("");
+  if(custom.length > 0){
+    html += `<optgroup label="\u2500\u2500 Customizados \u2500\u2500">`;
+    html += custom.map(l => {
+      const sel = l.nome === selectedNome ? " selected" : "";
+      return `<option value="${l.nome}"${sel}>\u2605 ${l.nome} (PF: ${l.pf > 0 ? '+'+l.pf : l.pf}\xB0C \xB7 Cl.${l.classe})</option>`;
+    }).join("");
+    html += `</optgroup>`;
+  }
+  return html;
+}
+
+function onLiquidoChange(i, selectEl){
+  const nome = selectEl.value;
+  const found = LIQUIDOS_DB.find(l => l.nome === nome);
+  if(found){
+    tanks[i].liquido = found.nome;
+    tanks[i].pf      = found.pf;
+    tanks[i].classe  = found.classe;
+  }
+  renderAll();
+}
+
+function renderTankList(){
+  const list = document.getElementById("tank-list");
+  list.innerHTML = "";
+  tanks.forEach((t,i) => {
+    const cls = classificar(t.pf);
+    const cssClass = cls === "I" ? "cls-I" : cls === "II" ? "cls-IB" : cls === "IIIA" ? "cls-IIIA" : "cls-IIIB";
+    const clsDet = t.classe || classificarDetalhado(t.pf);
+    const div = document.createElement("div");
+    div.className = "tank-item";
+    div.innerHTML = `
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+          <input class="tag-input" value="${t.tag}" onchange="tanks[${i}].tag=this.value;renderAll()" style="width:65px;">
+          <span class="tank-class ${cssClass}" id="cls-badge-${i}">Classe ${clsDet}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto auto;gap:5px;align-items:end;">
+          <div>
+            <div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Líquido</div>
+            <select id="liq-sel-${i}" onchange="onLiquidoChange(${i},this)"
+              style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;
+                     color:var(--text);font-family:'Inter',sans-serif;font-size:11.5px;padding:4px 6px;
+                     outline:none;cursor:pointer;transition:border .15s;"
+              onfocus="this.style.borderColor='var(--accent)'"
+              onblur="this.style.borderColor='var(--border)'">
+              ${buildLiquidOptions(t.liquido)}
+            </select>
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Diâm.(m)</div>
+            <input class="fi" type="number" min="0.1" step="0.5" value="${t.diam}"
+              onchange="tanks[${i}].diam=parseFloat(this.value)||0;renderAll()"
+              style="width:68px;">
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;display:flex;align-items:center;gap:3px;">
+              PF (°C)
+              <span class="pf-lock-icon" title="Ponto de Fulgor fixado pela Base de Dados. Para alterar, edite na aba &#34;Base de Dados&#34;." style="cursor:help;font-size:10px;color:#aab4c4;">🔒</span>
+            </div>
+            <input class="fi pf-readonly" type="number" step="1" value="${t.pf}"
+              readonly
+              onclick="alertPfLocked()"
+              style="width:62px;background:#f0f4f8;color:#8a98a8;cursor:not-allowed;border-color:#d0d8e4;user-select:none;"
+              title="Ponto de Fulgor fixado pela Base de Dados. Edite na aba Base de Dados para alterar.">
+          </div>
+        </div>
+      </div>
+      <button class="del-btn" onclick="removeTank(${i})" title="Remover tanque" style="align-self:flex-start;margin-top:2px;">✕</button>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function addTank(){
+  const def = LIQUIDOS_DB.find(l => l.nome === "Diesel") || LIQUIDOS_DB[0];
+  const tag = `T-00${tankCounter}`;
+  tanks.push({ tag, liquido: def.nome, diam:20, pf: def.pf, classe: def.classe, distReal:{} });
+  tankCounter++;
+  renderAll();
+}
+
+function removeTank(i){
+  if(tanks.length <= 1){ alert("É necessário ao menos 1 tanque."); return; }
+  tanks.splice(i,1);
+  renderAll();
+}
+
+function alertPfLocked(){
+  // Redireciona o usuário visualmente para a aba correta
+  const tabDados = document.querySelector('.tab[onclick*="tp-dados"]');
+  // Pequeno tooltip flash em vez de alert bloqueante
+  let tip = document.getElementById("pf-lock-tip");
+  if(!tip){
+    tip = document.createElement("div");
+    tip.id = "pf-lock-tip";
+    tip.style.cssText = "position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#1c2333;color:#fff;padding:9px 18px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:.4px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.3);display:flex;align-items:center;gap:8px;pointer-events:none;";
+    tip.innerHTML = `🔒 O Ponto de Fulgor é fixado pela <strong style="color:#90b8f5;">Base de Dados</strong>. Para editar, acesse a aba <strong style="color:#90b8f5;">Base de Dados</strong>.`;
+    document.body.appendChild(tip);
+  }
+  tip.style.opacity = "1";
+  tip.style.display = "flex";
+  clearTimeout(tip._timer);
+  tip._timer = setTimeout(() => { tip.style.opacity = "0"; setTimeout(()=>{ tip.style.display="none"; }, 300); }, 3000);
+}
+
+// ══════════════════════════════════════════
+
+// RENDER TABELA PARES
+// ══════════════════════════════════════════
+function renderPares(){
+  const tipoTeto  = document.getElementById("tipo-teto").value;
+  const classeLiq = document.getElementById("classe-liq").value;
+  const faixaDiam = document.getElementById("faixa-diam").value;
+  const tbody = document.getElementById("tbody-pares");
+  tbody.innerHTML = "";
+
+  if(tanks.length < 2){
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--dim);padding:20px;font-style:italic;">Cadastre ao menos 2 tanques para verificar os pares</td></tr>`;
+    document.getElementById("res-npares").textContent = "0";
+    document.getElementById("res-ok").textContent = "0";
+    document.getElementById("res-nok").textContent = "0";
+    document.getElementById("badge-status").textContent = "0 pares verificados";
+    document.getElementById("badge-status").className = "badge b-status";
+    return;
+  }
+
+  const frac = getFracao(tipoTeto, classeLiq, faixaDiam);
+  let totalOk = 0, totalNok = 0, totalPares = 0;
+
+  for(let i=0; i<tanks.length; i++){
+    for(let j=i+1; j<tanks.length; j++){
+      const t1 = tanks[i], t2 = tanks[j];
+      const pairKey = `${i}_${j}`;
+      const soma = t1.diam + t2.diam;
+      const dMin = Math.max(frac.frac * soma, frac.min);
+      const distKey = `${t1.tag}_${t2.tag}`;
+
+      // Recuperar dist real se existir
+      if(!t1.distReal) t1.distReal = {};
+      const distReal = t1.distReal[distKey] !== undefined ? t1.distReal[distKey] : "";
+
+      const isOk = distReal !== "" && parseFloat(distReal) >= dMin;
+      const isNok = distReal !== "" && parseFloat(distReal) < dMin;
+
+      let statusHtml = `<span class="status-pill pill-na">–</span>`;
+      if(distReal !== ""){
+        statusHtml = isOk
+          ? `<span class="status-pill pill-ok">✔ CONFORME</span>`
+          : `<span class="status-pill pill-err">✘ N/C</span>`;
+      }
+
+      if(distReal !== "") { isOk ? totalOk++ : totalNok++; }
+      totalPares++;
+
+      const cls1 = classificar(t1.pf);
+      const cls2 = classificar(t2.pf);
+      const css1 = cls1==="I"?"cls-I":cls1==="II"?"cls-IB":cls1==="IIIA"?"cls-IIIA":"cls-IIIB";
+      const css2 = cls2==="I"?"cls-I":cls2==="II"?"cls-IB":cls2==="IIIA"?"cls-IIIA":"cls-IIIB";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>
+          <strong style="font-family:'Share Tech Mono',monospace;">${t1.tag}</strong>
+          <br><span style="font-size:10px;color:var(--dim);">${t1.liquido}</span>
+          <span class="tank-class ${css1}" style="font-size:9px;padding:1px 5px;">Cl.${cls1}</span>
+        </td>
+        <td>
+          <strong style="font-family:'Share Tech Mono',monospace;">${t2.tag}</strong>
+          <br><span style="font-size:10px;color:var(--dim);">${t2.liquido}</span>
+          <span class="tank-class ${css2}" style="font-size:9px;padding:1px 5px;">Cl.${cls2}</span>
+        </td>
+        <td class="tcenter tmono">${t1.diam.toFixed(1)}</td>
+        <td class="tcenter tmono">${t2.diam.toFixed(1)}</td>
+        <td class="tcenter tmono" style="font-weight:700;">${soma.toFixed(1)}</td>
+        <td class="tcenter tmono">${frac.label}${frac.min>0?' ≥ '+frac.min.toFixed(1)+'m':''}</td>
+        <td class="tcenter tmono ${isNok?'twarn':''}" style="font-weight:700;">${dMin.toFixed(2)}</td>
+        <td class="tcenter">
+          <input type="number" min="0" step="0.1"
+            value="${distReal}"
+            placeholder="—"
+            onchange="setDistReal('${distKey}', ${i}, this.value); renderAll();"
+            style="width:70px;background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;font-family:'Share Tech Mono',monospace;font-size:12px;padding:3px 6px;text-align:right;outline:none;"
+            onfocus="this.style.borderColor='var(--accent)'"
+            onblur="this.style.borderColor='var(--border)'">
+        </td>
+        <td class="tcenter">${statusHtml}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  }
+
+  // Resumo
+  document.getElementById("res-ntanques").textContent = tanks.length;
+  document.getElementById("res-npares").textContent = totalPares;
+  document.getElementById("res-ok").textContent = totalOk;
+  document.getElementById("res-nok").textContent = totalNok;
+
+  const badgeEl = document.getElementById("badge-status");
+  if(totalNok > 0){
+    badgeEl.textContent = `${totalNok} par(es) não conforme(s)`;
+    badgeEl.className = "badge b-status";
+  } else if(totalOk === totalPares && totalPares > 0){
+    badgeEl.textContent = `${totalPares} par(es) conformes`;
+    badgeEl.className = "badge b-ok";
+  } else {
+    badgeEl.textContent = `${totalPares} pares verificados`;
+    badgeEl.className = "badge b-norm";
+  }
+
+  // Alerta geral
+  const alerta = document.getElementById("alerta-geral");
+  if(totalNok > 0){
+    alerta.style.display = "block";
+    alerta.className = "alert err";
+    alerta.innerHTML = `<strong>⚠ ${totalNok} par(es) com espaçamento insuficiente!</strong> Revise os pares marcados como "N/C" na tabela abaixo.`;
+  } else if(totalOk === totalPares && totalPares > 0){
+    alerta.style.display = "block";
+    alerta.className = "alert ok";
+    alerta.innerHTML = `<strong>✔ Todos os ${totalPares} pares estão conformes</strong> com a Tabela 2 da ${getNormaLabel()}.`;
+  } else {
+    alerta.style.display = "none";
+  }
+}
+
+function setDistReal(distKey, i, val){
+  if(!tanks[i].distReal) tanks[i].distReal = {};
+  tanks[i].distReal[distKey] = val !== "" ? parseFloat(val) : "";
+}
+
+// ══════════════════════════════════════════
+
+// AUTO-DETECÇÃO DIÂMETRO > 45 m
+// ══════════════════════════════════════════
+let faixaManualOverride = false; // true = usuário escolheu manualmente entre as opções gt45_*
+
+function onFaixaManualChange(){
+  faixaManualOverride = true;
+  update();
+}
+
+function autoDetectFaixa(){
+  const sel = document.getElementById("faixa-diam");
+  const msg = document.getElementById("faixa-auto-msg");
+  const maxDiam = tanks.length ? Math.max(...tanks.map(t => t.diam)) : 0;
+  const temGt45 = maxDiam > 45;
+  const current = sel.value;
+
+  if(temGt45){
+    // Se está em "ate45", corrigir automaticamente para gt45_dist (opção padrão)
+    if(current === "ate45"){
+      sel.value = "gt45_dist";
+      faixaManualOverride = false;
+      msg.style.display = "block";
+      msg.style.background = "#fef9e7";
+      msg.style.border = "1px solid #f9e79f";
+      msg.style.color = "#b7950b";
+      msg.innerHTML = `⚙ <strong>Ajustado automaticamente:</strong> tanque com Ø ${maxDiam.toFixed(1)} m detectado. Selecione o tipo de contenção se necessário.`;
+    } else {
+      // Já está numa opção gt45_* — apenas mostrar confirmação
+      msg.style.display = "block";
+      msg.style.background = "#eafaf1";
+      msg.style.border = "1px solid #a9dfbf";
+      msg.style.color = "#1e8449";
+      msg.innerHTML = `✔ Tanque com Ø ${maxDiam.toFixed(1)} m &gt; 45 m detectado. Condição: <strong>${sel.options[sel.selectedIndex].text}</strong>`;
+    }
+  } else {
+    // Nenhum tanque > 45 m
+    if(current !== "ate45"){
+      sel.value = "ate45";
+      faixaManualOverride = false;
+      msg.style.display = "block";
+      msg.style.background = "#e8f0fd";
+      msg.style.border = "1px solid #c5d9fb";
+      msg.style.color = "#1a73e8";
+      msg.innerHTML = `ℹ <strong>Ajustado automaticamente:</strong> nenhum tanque com Ø > 45 m. Condição resetada para "Todos ≤ 45 m".`;
+    } else {
+      msg.style.display = "none";
+    }
+  }
+}
+
+// ══════════════════════════════════════════
+
+// FORMULA DISPLAY
+// ══════════════════════════════════════════
+function updateFormulaDisplay(){
+  // Rodar auto-detecção antes de ler o valor
+  autoDetectFaixa();
+
+  const tipoTeto  = document.getElementById("tipo-teto").value;
+  const classeLiq = document.getElementById("classe-liq").value;
+  const faixaDiam = document.getElementById("faixa-diam").value;
+  const f = getFracao(tipoTeto, classeLiq, faixaDiam);
+  const min = f.min > 0 ? ` ≥ ${f.min.toFixed(1)} m` : "";
+  document.getElementById("formula-display").textContent = `D_mín = ${f.label} × (D₁ + D₂)${min}`;
+
+  // Mostrar/ocultar select classe líquido
+  const rowClasse = document.getElementById("row-classe-liq");
+  rowClasse.style.display = tipoTeto === "flutuante" ? "none" : "grid";
+}
+
+// ══════════════════════════════════════════
+
+// RENDER DADOS
+// ══════════════════════════════════════════
+function renderDados(){
+  const tbody = document.getElementById("tbody-dados");
+  tbody.innerHTML = "";
+  const total = LIQUIDOS_DB.length;
+  const customCount = LIQUIDOS_DB.filter(l => l.custom).length;
+  const countLabel = document.getElementById("dados-count-label");
+  if(countLabel){
+    countLabel.textContent = `${total} líquidos` + (customCount > 0 ? ` (${customCount} customizado${customCount>1?"s":""})` : "");
+  }
+
+  LIQUIDOS_DB.forEach((l, idx) => {
+    const cls = classificar(l.pf);
+    const clsDet = l.classe;
+    const cssClass = cls==="I"?"cls-I":cls==="II"?"cls-IB":cls==="IIIA"?"cls-IIIA":"cls-IIIB";
+    const pfDisplay = l.pf > 0 ? '+'+l.pf : l.pf;
+
+    // Célula PF: editável somente para líquidos custom
+    const pfCell = l.custom
+      ? `<td class="tcenter" style="padding:4px 8px;">
+           <div style="display:inline-flex;align-items:center;gap:4px;">
+             <input type="number" step="1" value="${l.pf}"
+               id="pf-edit-${idx}"
+               onchange="editarPfCustom(${idx}, this.value)"
+               style="width:62px;font-family:'Share Tech Mono',monospace;font-size:12px;padding:3px 6px;text-align:right;
+                      background:#fff8e1;border:1.5px solid #f9e79f;border-radius:5px;outline:none;color:var(--text);transition:all .15s;"
+               onfocus="this.style.borderColor='var(--water)';this.style.background='#fff'"
+               onblur="this.style.borderColor='#f9e79f';this.style.background='#fff8e1'"
+               title="Edite o ponto de fulgor aqui. A classe será recalculada automaticamente.">
+             <span style="font-size:10px;color:#b7950b;" title="Editável – ponto de fulgor customizado">✏️</span>
+           </div>
+         </td>`
+      : `<td class="tcenter tmono" style="color:var(--dim);">${pfDisplay}</td>`;
+
+    const tr = document.createElement("tr");
+    if(l.custom) tr.className = "custom-liq-row";
+    tr.innerHTML = `
+      <td>
+        <strong>${l.nome}</strong>
+        ${l.custom ? '<span style="font-size:9px;background:#e0f0ff;color:#1a73e8;border:1px solid #c5d9fb;border-radius:3px;padding:1px 5px;margin-left:5px;font-family:\'Rajdhani\',sans-serif;font-weight:700;letter-spacing:.3px;">CUSTOM</span>' : ''}
+      </td>
+      ${pfCell}
+      <td class="tcenter" id="cls-cell-${idx}"><span class="tank-class ${cssClass}">Classe ${clsDet}</span></td>
+      <td style="font-size:11px;color:var(--dim);">${l.obs}</td>
+      <td class="tcenter">
+        ${l.custom ? `<button class="btn-remove-custom" onclick="removerLiquidoCustom(${idx})" title="Remover líquido customizado">✕</button>` : ''}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function editarPfCustom(idx, novoValor){
+  const pf = parseFloat(novoValor);
+  if(isNaN(pf)) return;
+  const liq = LIQUIDOS_DB[idx];
+  if(!liq || !liq.custom) return;
+
+  const nomeAntigo = liq.nome;
+  const info = getClasseInfo(pf);
+  liq.pf     = pf;
+  liq.classe = info.classe;
+
+  // Atualizar badge de classe na tabela sem re-render completo
+  const clsCell = document.getElementById(`cls-cell-${idx}`);
+  if(clsCell) clsCell.innerHTML = `<span class="tank-class ${info.cssClass}">${info.label}</span>`;
+
+  // Propagar mudança para todos os tanques que usam este líquido
+  let atualizou = false;
+  tanks.forEach(t => {
+    if(t.liquido === nomeAntigo){
+      t.pf     = pf;
+      t.classe = info.classe;
+      atualizou = true;
+    }
+  });
+
+  if(atualizou){
+    renderTankList();
+    renderAll();
+  }
+  saveState();
+}
+
+// ══════════════════════════════════════════
+// ADICIONAR LÍQUIDO CUSTOMIZADO
+// ══════════════════════════════════════════
+function toggleAddLiqForm(){
+  const fields = document.getElementById("add-liq-fields");
+  const form   = document.getElementById("add-liq-form");
+  const btn    = document.getElementById("btn-toggle-add-liq");
+  const open   = fields.style.display === "none";
+  fields.style.display = open ? "block" : "none";
+  btn.textContent      = open ? "Recolher" : "Expandir";
+  form.classList.toggle("open", open);
+  if(open){
+    document.getElementById("new-liq-nome").focus();
+  }
+}
+
+function getClasseInfo(pf){
+  const pfN = parseFloat(pf);
+  if(isNaN(pfN)) return null;
+  let classe, cssClass, label;
+  if(pfN < 23){
+    if(pfN < -20){ classe="IA"; label="Classe IA"; cssClass="cls-I"; }
+    else         { classe="IB"; label="Classe IB"; cssClass="cls-I"; }
+  } else if(pfN < 38){ classe="IC";   label="Classe IC";   cssClass="cls-I";    }
+  else if(pfN < 60)  { classe="II";   label="Classe II";   cssClass="cls-IB";   }
+  else if(pfN < 93)  { classe="IIIA"; label="Classe IIIA"; cssClass="cls-IIIA"; }
+  else               { classe="IIIB"; label="Classe IIIB"; cssClass="cls-IIIB"; }
+  return { classe, label, cssClass };
+}
+
+function onNewLiqChange(){
+  const nomeEl   = document.getElementById("new-liq-nome");
+  const pfEl     = document.getElementById("new-liq-pf");
+  const previewEl= document.getElementById("new-liq-preview");
+  const erroEl   = document.getElementById("new-liq-erro");
+  const clsDiv   = document.getElementById("new-liq-classe-preview");
+
+  erroEl.style.display = "none";
+
+  const pf = pfEl.value.trim();
+  const nome = nomeEl.value.trim();
+
+  if(!pf){
+    clsDiv.innerHTML = '<span style="color:var(--dim);">Informe o PF →</span>';
+    previewEl.style.display = "none";
+    return;
+  }
+
+  const info = getClasseInfo(pf);
+  if(!info){
+    clsDiv.innerHTML = '<span style="color:var(--dim);">—</span>';
+    previewEl.style.display = "none";
+    return;
+  }
+
+  // Update class preview
+  clsDiv.innerHTML = `<span class="tank-class ${info.cssClass}" style="font-size:11px;">${info.label}</span>`;
+  clsDiv.style.background = "transparent";
+  clsDiv.style.border = "none";
+  clsDiv.style.padding = "0";
+
+  // Update full preview
+  if(nome){
+    previewEl.style.display = "flex";
+    document.getElementById("prev-nome").textContent = nome;
+    document.getElementById("prev-pf").textContent = parseFloat(pf) > 0 ? '+'+parseFloat(pf) : parseFloat(pf);
+    const badgeEl = document.getElementById("prev-classe-badge");
+    badgeEl.textContent = info.label;
+    badgeEl.className = `tank-class ${info.cssClass}`;
+    const obsEl = document.getElementById("prev-obs");
+    const obs = document.getElementById("new-liq-obs").value.trim();
+    obsEl.textContent = obs || "";
+  } else {
+    previewEl.style.display = "none";
+  }
+}
+
+function adicionarLiquidoCustom(){
+  const nomeEl    = document.getElementById("new-liq-nome");
+  const pfEl      = document.getElementById("new-liq-pf");
+  const obsEl     = document.getElementById("new-liq-obs");
+  const erroEl    = document.getElementById("new-liq-erro");
+  const sucessoEl = document.getElementById("new-liq-sucesso");
+
+  erroEl.style.display = "none";
+  sucessoEl.style.display = "none";
+
+  const nome = nomeEl.value.trim();
+  const pfStr = pfEl.value.trim();
+  const obs  = obsEl.value.trim();
+
+  // Validações
+  if(!nome){
+    erroEl.textContent = "⚠ Informe o nome do líquido.";
+    erroEl.style.display = "block";
+    nomeEl.focus();
+    return;
+  }
+  if(pfStr === ""){
+    erroEl.textContent = "⚠ Informe o ponto de fulgor (°C).";
+    erroEl.style.display = "block";
+    pfEl.focus();
+    return;
+  }
+  const pf = parseFloat(pfStr);
+  if(isNaN(pf)){
+    erroEl.textContent = "⚠ Ponto de fulgor inválido.";
+    erroEl.style.display = "block";
+    pfEl.focus();
+    return;
+  }
+  // Verificar duplicata
+  const jaExiste = LIQUIDOS_DB.some(l => l.nome.toLowerCase() === nome.toLowerCase());
+  if(jaExiste){
+    erroEl.textContent = `⚠ O líquido "${nome}" já existe na base de dados.`;
+    erroEl.style.display = "block";
+    nomeEl.focus();
+    return;
+  }
+
+  const info = getClasseInfo(pf);
+  const novoLiq = {
+    nome,
+    pf,
+    classe: info.classe,
+    obs: obs || "Líquido customizado",
+    custom: true
+  };
+
+  LIQUIDOS_DB.push(novoLiq);
+  renderDados();
+  // Atualizar os selects de líquido nos tanques
+  renderTankList();
+  saveState();
+
+  sucessoEl.innerHTML = `✔ <strong>${nome}</strong> (PF: ${pf > 0 ? '+'+pf : pf}°C · ${info.label}) adicionado com sucesso! Agora disponível na lista de líquidos dos tanques.`;
+  sucessoEl.style.display = "block";
+
+  // Limpar campos
+  nomeEl.value = "";
+  pfEl.value   = "";
+  obsEl.value  = "";
+  document.getElementById("new-liq-classe-preview").innerHTML = '<span style="color:var(--dim);">Informe o PF →</span>';
+  document.getElementById("new-liq-classe-preview").style.cssText = "height:30px;display:flex;align-items:center;padding:0 8px;background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--dim);";
+  document.getElementById("new-liq-preview").style.display = "none";
+
+  // Sumir a mensagem de sucesso após 5s
+  setTimeout(() => { if(sucessoEl) sucessoEl.style.display = "none"; }, 5000);
+}
+
+function removerLiquidoCustom(idx){
+  const liq = LIQUIDOS_DB[idx];
+  if(!liq || !liq.custom) return;
+  // Verificar se algum tanque está usando
+  const usandoEm = tanks.filter(t => t.liquido === liq.nome);
+  if(usandoEm.length > 0){
+    const tags = usandoEm.map(t => t.tag).join(", ");
+    if(!confirm(`O líquido "${liq.nome}" está em uso no(s) tanque(s): ${tags}.\nAo remover, esses tanques voltarão para o líquido padrão. Deseja continuar?`)) return;
+    // Resetar tanques que usam este líquido para o primeiro da lista
+    const fallback = LIQUIDOS_DB.find(l => !l.custom) || LIQUIDOS_DB[0];
+    tanks.forEach(t => {
+      if(t.liquido === liq.nome){
+        t.liquido = fallback.nome;
+        t.pf      = fallback.pf;
+        t.classe  = fallback.classe;
+      }
+    });
+  }
+  LIQUIDOS_DB.splice(idx, 1);
+  renderDados();
+  renderTankList();
+  renderAll();
+  saveState();
+}
+
+// ══════════════════════════════════════════
+// PERSISTÊNCIA DE ESTADO
+// ══════════════════════════════════════════
+const STORAGE_KEY = 'checklist_distanciamentos_tanques_v1';
+
+function getEmbeddedState() {
+  const el = document.getElementById('embedded-state');
+  if (!el) return null;
+  try { return JSON.parse(el.textContent); } catch (e) { return null; }
+}
+
+function collectFormValues(){
+  const values = {};
+  document.querySelectorAll('input[id], select[id], textarea[id]').forEach(el => {
+    values[el.id] = el.value;
+  });
+  return values;
+}
+
+function applyFormValues(values){
+  if(!values) return;
+  Object.entries(values).forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.value = value;
+  });
+}
+
+function getAppState(){
+  return {
+    tanks,
+    tankCounter,
+    faixaManualOverride,
+    customLiquidos: LIQUIDOS_DB.filter(l => l.custom),
+    formValues: collectFormValues()
+  };
+}
+
+function saveState(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(getAppState()));
+  } catch (e) {}
+}
+
+function loadState(){
+  let state = null;
+  try {
+    state = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+  } catch (e) {
+    state = null;
+  }
+  if(!state) state = getEmbeddedState();
+  if(!state) return;
+  if(Array.isArray(state.tanks) && state.tanks.length) tanks = state.tanks;
+  if(typeof state.tankCounter === 'number') tankCounter = state.tankCounter;
+  if(typeof state.faixaManualOverride === 'boolean') faixaManualOverride = state.faixaManualOverride;
+  // Restaurar líquidos customizados
+  if(Array.isArray(state.customLiquidos) && state.customLiquidos.length){
+    state.customLiquidos.forEach(l => {
+      if(!LIQUIDOS_DB.some(x => x.nome === l.nome)){
+        LIQUIDOS_DB.push({ ...l, custom: true });
+      }
+    });
+  }
+  applyFormValues(state.formValues);
+}
+
+function syncControlsForExport(root){
+  root.querySelectorAll('input, select, textarea').forEach(el => {
+    if(el.tagName === 'SELECT'){
+      Array.from(el.options).forEach(opt => opt.removeAttribute('selected'));
+      if(el.selectedIndex >= 0) el.options[el.selectedIndex].setAttribute('selected','selected');
+    } else if(el.tagName === 'TEXTAREA'){
+      el.textContent = el.value;
+    } else {
+      if(['checkbox','radio'].includes(el.type)){
+        if(el.checked) el.setAttribute('checked','checked');
+        else el.removeAttribute('checked');
+      } else {
+        el.setAttribute('value', el.value);
+      }
+    }
+  });
+}
+
+function buildExportHtml(){
+  saveState();
+  const clone = document.documentElement.cloneNode(true);
+  syncControlsForExport(clone);
+  let stateEl = clone.querySelector('#embedded-state');
+  if(!stateEl){
+    stateEl = document.createElement('script');
+    stateEl.id = 'embedded-state';
+    stateEl.type = 'application/json';
+    clone.querySelector('body').appendChild(stateEl);
+  }
+  stateEl.textContent = JSON.stringify(getAppState()).replace(/</g, '\\u003c');
+  return '<!DOCTYPE html>\n' + clone.outerHTML;
+}
+
+// ══════════════════════════════════════════
+
+// TABS
+// ══════════════════════════════════════════
+function sw(el, id){
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tabpanel").forEach(p => p.classList.remove("active"));
+  el.classList.add("active");
+  document.getElementById("tp-"+id).classList.add("active");
+}
+
+// ══════════════════════════════════════════
+
+// SALVAR HTML
+// ══════════════════════════════════════════
+function salvarHTML(){
+  const blob = new Blob([buildExportHtml()], { type:"text/html;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "Checklist_Espacamento_Costados_Tanques_atualizado.html";
+  a.click();
+}
+
+// ══════════════════════════════════════════
+
+// UPDATE / RENDER ALL
+// ══════════════════════════════════════════
+function update(){ updateFormulaDisplay(); renderPares(); renderDistancias(); saveState(); }
+function renderAll(){ renderTankList(); update(); saveState(); }
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+
+// DISTÂNCIAS AO ENTORNO – TABELAS 2.1, 2.2, 2.6
+// ══════════════════════════════════════════
+
+// Tabela 2.2: capacidade → distâncias (limite propriedade, vias/edificações)
+const TAB22 = [
+  { maxVol:1,      limProp:1.5,  viasEdif:1.5 },
+  { maxVol:3,      limProp:3.0,  viasEdif:1.5 },
+  { maxVol:45,     limProp:4.5,  viasEdif:1.5 },
+  { maxVol:113,    limProp:6.0,  viasEdif:1.5 },
+  { maxVol:189,    limProp:9.0,  viasEdif:3.0 },
+  { maxVol:378,    limProp:15.0, viasEdif:4.5 },
+  { maxVol:1893,   limProp:24.0, viasEdif:7.5 },
+  { maxVol:3785,   limProp:30.0, viasEdif:10.5 },
+  { maxVol:7571,   limProp:40.5, viasEdif:13.5 },
+  { maxVol:11356,  limProp:49.5, viasEdif:16.5 },
+  { maxVol:Infinity,limProp:52.5,viasEdif:18.0 },
+];
+
+function getTab22(vol){
+  for(const r of TAB22){ if(vol <= r.maxVol) return r; }
+  return TAB22[TAB22.length-1];
+}
+
+// Tabela 2.6: classe IIIB por capacidade
+const TAB26 = [
+  { maxVol:46,       limProp:1.5, viasEdif:1.5 },
+  { maxVol:114,      limProp:3.0, viasEdif:1.5 },
+  { maxVol:190,      limProp:3.0, viasEdif:3.0 },
+  { maxVol:380,      limProp:4.5, viasEdif:3.0 },
+  { maxVol:Infinity, limProp:4.5, viasEdif:4.5 },
+];
+
+function getTab26(vol){
+  for(const r of TAB26){ if(vol <= r.maxVol) return r; }
+  return TAB26[TAB26.length-1];
+}
+
+// Volume esférico equivalente a partir do diâmetro (tanque vertical):
+// Vol = π/4 × D² × H — mas aqui não temos H, usamos capacidade
+// Aproximação: tanque vertical H = D (proporcional típica); apenas para lookup Tab.2.2
+// O usuário pode querer informar capacidade real — adicionamos campo cap por tanque
+function getCapacidade(t){
+  // Se o tanque tem capacidade salva, usa; senão estima H = D
+  if(t.cap && t.cap > 0) return t.cap;
+  const H = t.diam; // estimativa
+  return Math.PI/4 * t.diam * t.diam * H;
+}
+
+// Calcular distâncias mínimas para um tanque
+function calcDistMinimas(t, tipoTeto, cbpmesp, pressao){
+  const cls = classificar(t.pf);
+  const vol = getCapacidade(t);
+  const semCBP = cbpmesp === "sem";
+
+  let limProp, viasEdif, metodo;
+
+  if(cls === "IIIB"){
+    // Tabela 2.6
+    const r = getTab26(vol);
+    limProp   = r.limProp;
+    viasEdif  = r.viasEdif;
+    metodo = "Tab. 2.6";
+  } else if(pressao === "gt17"){
+    // Tabela 2.3: 1,5× Tab.2.2 (com CB), mín 7,5m / 3× Tab.2.2 sem CB, mín 15m
+    const r = getTab22(vol);
+    if(semCBP){
+      limProp  = Math.max(3 * r.limProp, 15);
+      viasEdif = Math.max(1.5 * r.viasEdif, 7.5);
+    } else {
+      limProp  = Math.max(1.5 * r.limProp, 7.5);
+      viasEdif = Math.max(1.5 * r.viasEdif, 7.5);
+    }
+    metodo = "Tab. 2.3";
+  } else {
+    // Pressão ≤ 17 kPa → Tabela 2.1 (simplificada por tipo de teto)
+    // Distância ao limite de propriedade:
+    let fatorDiamLim = 0;
+    let fatorDiamVia = 0;
+    if(tipoTeto === "flutuante"){
+      fatorDiamLim = semCBP ? 1.0 : 0.5; // diâmetro do tanque (limitado 53m sem CBP)
+      fatorDiamVia = 1/6;
+      metodo = "Tab. 2.1 (teto flutuante)";
+    } else if(tipoTeto === "fragilizado"){
+      // Teto fixo solda fragilizada, com espuma
+      fatorDiamLim = semCBP ? 2.0 : 1.0;
+      fatorDiamVia = 1/3;
+      metodo = "Tab. 2.1 (solda fragilizada)";
+    } else if(tipoTeto === "fixo_espuma"){
+      // Teto fixo com espuma/inertização
+      // Com CB: diâmetro do tanque; Sem CB: dobro do diâmetro (limitado 105m)
+      fatorDiamLim = semCBP ? 2.0 : 1.0;
+      fatorDiamVia = 1/3;
+      metodo = "Tab. 2.1 (teto fixo c/ espuma)";
+    } else {
+      // Teto fixo sem espuma → Tab. 2.2
+      const r = getTab22(vol);
+      if(semCBP){
+        limProp  = Math.min(2 * r.limProp, 90);
+        viasEdif = r.viasEdif;
+      } else {
+        limProp  = r.limProp;
+        viasEdif = r.viasEdif;
+      }
+      metodo = "Tab. 2.1 → Tab. 2.2";
+      // Apply minimum 1.5m
+      limProp  = Math.max(limProp,  1.5);
+      viasEdif = Math.max(viasEdif, 1.5);
+      return { limProp, viasEdif, metodo };
+    }
+
+    // Calcular baseado no diâmetro
+    limProp  = Math.max(fatorDiamLim * t.diam, 1.5);
+    viasEdif = Math.max(fatorDiamVia * t.diam, 1.5);
+
+    // Aplicar dobro sem CBP e limitar 90m
+    if(semCBP && tipoTeto !== "flutuante" && tipoTeto !== "fragilizado"){
+      limProp = Math.min(limProp * 2, 90);
+    }
+    if(semCBP && tipoTeto === "flutuante"){
+      limProp = Math.min(t.diam, 53); // limitado a 53m sem CB
+    }
+  }
+
+  if(semCBP && cls !== "IIIB" && pressao !== "gt17"){
+    // já aplicado acima no teto fixo sem espuma
+  }
+
+  return {
+    limProp:  Math.max(limProp,  1.5),
+    viasEdif: Math.max(viasEdif, 1.5),
+    metodo
+  };
+}
+
+function renderDistancias(){
+  if(!tanks || tanks.length === 0) return;
+
+  const tipoTeto = document.getElementById("dist-tipo-teto").value;
+  const cbpmesp  = document.getElementById("dist-cbpmesp").value;
+  const pressao  = document.getElementById("dist-pressao").value;
+  const tbody    = document.getElementById("tbody-distancias");
+  tbody.innerHTML = "";
+
+  let totalOk = 0, totalNok = 0;
+
+  tanks.forEach((t, i) => {
+    const cls = classificar(t.pf);
+    const cssClass = cls==="I"?"cls-I":cls==="II"?"cls-IB":cls==="IIIA"?"cls-IIIA":"cls-IIIB";
+    const clsDet = t.classe || classificarDetalhado(t.pf);
+    const vol = getCapacidade(t);
+    const mins = calcDistMinimas(t, tipoTeto, cbpmesp, pressao);
+
+    const dRealLim  = t.distLimProp  !== undefined ? t.distLimProp  : "";
+    const dRealVia  = t.distViasEdif !== undefined ? t.distViasEdif : "";
+
+    const okLim  = dRealLim  !== "" && parseFloat(dRealLim)  >= mins.limProp;
+    const okVia  = dRealVia  !== "" && parseFloat(dRealVia)  >= mins.viasEdif;
+    const nokLim = dRealLim  !== "" && parseFloat(dRealLim)  <  mins.limProp;
+    const nokVia = dRealVia  !== "" && parseFloat(dRealVia)  <  mins.viasEdif;
+
+    if(dRealLim !== "" || dRealVia !== ""){
+      const hasNok = nokLim || nokVia;
+      hasNok ? totalNok++ : totalOk++;
+    }
+
+    const statusLim = dRealLim === "" ? `<span class="status-pill pill-na">–</span>`
+      : okLim ? `<span class="status-pill pill-ok">✔</span>`
+               : `<span class="status-pill pill-err">✘ N/C</span>`;
+    const statusVia = dRealVia === "" ? `<span class="status-pill pill-na">–</span>`
+      : okVia ? `<span class="status-pill pill-ok">✔</span>`
+               : `<span class="status-pill pill-err">✘ N/C</span>`;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>
+        <strong style="font-family:'Share Tech Mono',monospace;">${t.tag}</strong>
+        <div style="font-size:10px;color:var(--dim);margin-top:2px;">${mins.metodo}</div>
+      </td>
+      <td class="tcenter">
+        <span class="tank-class ${cssClass}" style="font-size:10px;">${clsDet}</span>
+        <div style="font-size:10px;color:var(--dim);margin-top:2px;">${t.liquido}</div>
+      </td>
+      <td class="tcenter tmono">${t.diam.toFixed(1)}</td>
+      <td class="tcenter">
+        <input type="number" min="0" step="1" value="${vol > 0 ? Math.round(vol) : ''}"
+          placeholder="cap. m³"
+          onchange="tanks[${i}].cap=parseFloat(this.value)||0; renderDistancias();"
+          style="width:70px;background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;
+                 font-family:'Share Tech Mono',monospace;font-size:11px;padding:3px 6px;text-align:right;outline:none;"
+          onfocus="this.style.borderColor='var(--accent)'"
+          onblur="this.style.borderColor='var(--border)'"
+          title="Capacidade real do tanque em m³ (se vazio, estimado como Vol = π/4 × D² × D)">
+        <div style="font-size:9px;color:var(--dim);margin-top:1px;">${t.cap && t.cap > 0 ? 'real' : 'estimado'}</div>
+      </td>
+      <td class="tcenter tmono" style="border-left:2px solid #e8ecf4;font-weight:700;color:var(--water);">${mins.limProp.toFixed(1)}</td>
+      <td class="tcenter">
+        <input type="number" min="0" step="0.1" value="${dRealLim}"
+          placeholder="—"
+          onchange="tanks[${i}].distLimProp=parseFloat(this.value)||''; renderDistancias();"
+          style="width:68px;background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;
+                 font-family:'Share Tech Mono',monospace;font-size:12px;padding:3px 6px;text-align:right;outline:none;"
+          onfocus="this.style.borderColor='var(--accent)'"
+          onblur="this.style.borderColor='var(--border)'">
+      </td>
+      <td class="tcenter">${statusLim}</td>
+      <td class="tcenter tmono" style="border-left:2px solid #e8ecf4;font-weight:700;color:var(--foam);">${mins.viasEdif.toFixed(1)}</td>
+      <td class="tcenter">
+        <input type="number" min="0" step="0.1" value="${dRealVia}"
+          placeholder="—"
+          onchange="tanks[${i}].distViasEdif=parseFloat(this.value)||''; renderDistancias();"
+          style="width:68px;background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;
+                 font-family:'Share Tech Mono',monospace;font-size:12px;padding:3px 6px;text-align:right;outline:none;"
+          onfocus="this.style.borderColor='var(--accent)'"
+          onblur="this.style.borderColor='var(--border)'">
+      </td>
+      <td class="tcenter">${statusVia}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("dist-res-n").textContent   = tanks.length;
+  document.getElementById("dist-res-ok").textContent  = totalOk;
+  document.getElementById("dist-res-nok").textContent = totalNok;
+
+  // Badge no header
+  const bdg = document.getElementById("badge-dist");
+  if(totalNok > 0){
+    bdg.style.display = "";
+    bdg.className = "badge b-status";
+    bdg.textContent = `Entorno: ${totalNok} N/C`;
+  } else if(totalOk > 0){
+    bdg.style.display = "";
+    bdg.className = "badge b-ok";
+    bdg.textContent = `Entorno: ${totalOk} ✔`;
+  } else {
+    bdg.style.display = "none";
+  }
+}
+
+
+// ══════════════════════════════════════════
+
+// MEMORIAL DE CÁLCULO
+// ══════════════════════════════════════════
+function abrirMemorial(){
+  gerarMemorial();
+  document.getElementById("mem-overlay").classList.add("open");
+}
+function fecharMemorial(){
+  document.getElementById("mem-overlay").classList.remove("open");
+}
+
+function fmem(n, d=2){ return (+n).toFixed(d); }
+
+function gerarMemorial(){
+  const now    = new Date();
+  const dataStr = now.toLocaleDateString("pt-BR");
+
+  const escritorio  = document.getElementById("mf-escritorio").value.trim()  || "—";
+  const responsavel = document.getElementById("mf-responsavel").value.trim() || "—";
+  const titulo      = document.getElementById("mf-titulo").value.trim()      || "—";
+  const crea        = document.getElementById("mf-crea").value.trim()        || "—";
+  const cliente     = document.getElementById("mf-cliente").value.trim()     || "—";
+  const projeto     = document.getElementById("mf-projeto").value.trim()     || "—";
+  const local_      = document.getElementById("mf-local").value.trim()       || "—";
+  const docnum      = document.getElementById("mf-docnum").value.trim()      || "ESP-001";
+  const rev         = document.getElementById("mf-rev").value.trim()         || "R00";
+  const obs         = document.getElementById("mf-obs").value.trim();
+
+  // ── parâmetros globais lidos da interface ──
+  const tipoTeto  = document.getElementById("tipo-teto")?.value   || "flutuante";
+  const classeLiq = document.getElementById("classe-liq")?.value  || "I_II";
+  const faixaDiam = document.getElementById("faixa-diam")?.value  || "ate45";
+  const cbpmesp   = document.getElementById("dist-cbpmesp")?.value   || "com";
+  const tipoTetoDist = document.getElementById("dist-tipo-teto")?.value || "flutuante";
+  const pressao   = document.getElementById("dist-pressao")?.value  || "ate17";
+
+  const tipoTetoLabel = {
+    "flutuante":"Teto flutuante / selo flutuante",
+    "fixo":"Teto fixo / horizontal",
+  }[tipoTeto] || tipoTeto;
+
+  const faixaLabel = {
+    "ate45":"Todos os tanques com Ø ≤ 45 m",
+    "gt45_dist":"Algum tanque com Ø > 45 m – bacia de contenção à distância",
+    "gt45_dique":"Algum tanque com Ø > 45 m – com dique",
+  }[faixaDiam] || faixaDiam;
+
+  const fracObj = getFracao(tipoTeto, classeLiq, faixaDiam);
+
+  // ── fração de espaçamento descrita ──
+  const fracLabel = fracObj.label;
+  const fracMin   = fracObj.min > 0 ? ` (mínimo ${fracObj.min.toFixed(1)} m)` : "";
+
+  // normaAviso — nota simples apenas quando norma não é NTCB/NBR verificada
+  const normaPresetCheck = document.getElementById("norma-preset")?.value || "nbr";
+  const normaAviso = getNormaAviso() && normaPresetCheck !== "ntcb_mt";
+  const normaAvisoHtml = "";  // aviso removido do imprimível — norma já consta na ficha
+
+  // ── cabeçalho do documento ──
+  let html = `
+  <div class="doc-topo">
+    <div class="doc-logo-area">
+      <div class="doc-logo-nome">${escritorio}</div>
+      <div class="doc-logo-sub">${titulo} &nbsp;·&nbsp; ${responsavel}</div>
+      <div class="doc-crea">${crea}</div>
+    </div>
+    <div class="doc-num-area">
+      <div class="doc-num">${docnum}</div>
+      <div><span class="doc-rev">${rev}</span></div>
+      <div style="font-size:8pt;color:#666;font-family:Arial,sans-serif;margin-top:4px">${dataStr}</div>
+    </div>
+  </div>
+  <h1>Memorial Descritivo de Cálculo</h1>
+  <div class="doc-subtitulo">Verificação de Espaçamentos e Distâncias de Tanques de Armazenamento</div>
+  <table class="doc-ficha">
+    <tr><td class="lbl">Cliente / Empresa</td><td>${cliente}</td><td class="lbl">Instalação / Projeto</td><td>${projeto}</td></tr>
+    <tr><td class="lbl">Localização</td><td colspan="3">${local_}</td></tr>
+    <tr><td class="lbl">Responsável Técnico</td><td>${responsavel} — ${crea}</td><td class="lbl">Data de Emissão</td><td>${dataStr}</td></tr>
+    <tr><td class="lbl">Normas Aplicáveis</td><td colspan="3">${getNormaLabel()} &nbsp;·&nbsp; ABNT NBR 17505-1</td></tr>
+  </table>`;
+  html += normaAvisoHtml;
+
+  // ── 0. Declaração ──
+  const normaPresetVal = document.getElementById("norma-preset")?.value || "nbr";
+  const isNTCBmt = normaPresetVal === "ntcb_mt";
+
+  // Texto de referência normativa específico para NTCB 24/MT
+  const refNormativaTexto = isNTCBmt
+    ? `${getNormaLabel()} §2.3.2.2 – Tabelas 2.1, 2.2, 2.6 e 2.7`
+    : `${getNormaLabel()} – Tabelas 2.1, 2.2, 2.6 e 2.7`;
+
+  const declaracaoTexto = isNTCBmt
+    ? `O presente Memorial Descritivo foi elaborado por <strong>${responsavel}</strong>, detentor do registro profissional <strong>${crea}</strong>. O documento verifica os afastamentos mínimos entre costados de tanques de armazenamento de líquidos inflamáveis e combustíveis e as distâncias mínimas ao entorno (limites de propriedade, vias de circulação e edificações), em conformidade com a <strong>NTCB 24/2020 do Corpo de Bombeiros Militar do Estado de Mato Grosso (CBMMT)</strong>, aplicável a todas as edificações e locais de risco no Estado de Mato Grosso (NTCB 24/2020 §1.2.1).`
+    : `O presente Memorial Descritivo foi elaborado por <strong>${responsavel}</strong>, detentor do registro profissional <strong>${crea}</strong>. O documento verifica os espaçamentos mínimos entre costados de tanques de armazenamento de líquidos igníferos (inflamáveis e combustíveis) e as distâncias mínimas ao entorno (limites de propriedade, vias de circulação e edificações), em conformidade com a <strong>${getNormaLabel()}</strong>.`;
+
+  html += `
+  <h2>0. Declaração de Responsabilidade Técnica</h2>
+  <p>${declaracaoTexto}</p>
+  <div class="norm-ref"><strong>Referências normativas:</strong> ${refNormativaTexto}</div>`;
+
+  // Nota de verificação de tabelas para NTCB 24/MT
+  if(isNTCBmt){
+    html += `<div class="doc-ok" style="margin-top:4px;">✔ <strong>Conformidade das tabelas verificada:</strong> Os valores das Tabelas 2.1, 2.2, 2.6 e 2.7 da NTCB 24/2020 (CBMMT/MT) foram conferidos e são idênticos aos utilizados nesta ferramenta, conforme publicação no BGE/CBMMT nº 2429 de 22/10/2020 e DOE nº 27872 de 06/11/2020.</div>`;
+  }
+
+  // ── 1. Parâmetros Gerais ──
+  html += `
+  <h2>1. Parâmetros Gerais Adotados</h2>
+  <table class="res-table">
+    <tr><th>Parâmetro</th><th>Valor Adotado</th><th>Referência</th></tr>
+    <tr><td>Tipo de teto (espaçamento entre costados)</td><td>${tipoTetoLabel}</td><td>${getNormaShort()} Tab. 2</td></tr>
+    <tr><td>Condição de diâmetro do parque</td><td>${faixaLabel}</td><td>${getNormaShort()} Tab. 2</td></tr>
+    <tr><td>Fração adotada (Tab. 2)</td><td><strong>${fracLabel} × (D₁ + D₂)${fracMin}</strong></td><td>${getNormaShort()} §18.2.2</td></tr>
+    <tr><td>Cobertura ${isNTCBmt ? "Corpo de Bombeiros / Plano de Auxílio Mútuo" : "Corpo de Bombeiros / OCM"}</td><td>${cbpmesp === "com" ? (isNTCBmt ? "Com Corpo de Bombeiros ou Plano de Auxílio Mútuo" : "Com Corpo de Bombeiros ou OCM") : (isNTCBmt ? "Sem Corpo de Bombeiros Militar local / PAM (distâncias dobradas)" : "Sem Corpo de Bombeiros e sem OCM (distâncias dobradas)")}</td><td>${getNormaShort()} Tab. 2.1 Notas</td></tr>
+    <tr><td>Tipo de teto (distâncias ao entorno)</td><td>${{flutuante:"Teto Flutuante / Selo Flutuante",fragilizado:"Teto Fixo – Solda Fragilizada",fixo_espuma:"Teto Fixo – c/ espuma ou inertização",fixo_sem:"Teto Fixo – sem espuma/inertização"}[tipoTetoDist] || tipoTetoDist}</td><td>${getNormaShort()} Tab. 2.1</td></tr>
+    <tr><td>Pressão de operação</td><td>${pressao === "ate17" ? "≤ 17 kPa" : "> 17 kPa"}</td><td>NBR 17505-2 ${getNormaShort()} Tab. 2.1 / 2.3</td></tr>
+  </table>`;
+
+  // ── 2. Cadastro dos Tanques ──
+  html += `
+  <h2>2. Cadastro dos Tanques do Parque</h2>
+  <table class="res-table">
+    <tr>
+      <th>TAG</th><th>Líquido</th><th>PF (°C)</th><th>Classe</th>
+      <th>Ø (m)</th><th>Cap. (m³)</th>
+    </tr>`;
+  tanks.forEach(t => {
+    const clsDet = t.classe || classificarDetalhado(t.pf);
+    const vol = getCapacidade(t);
+    html += `<tr>
+      <td><strong>${t.tag}</strong></td>
+      <td>${t.liquido}</td>
+      <td>${t.pf}</td>
+      <td>${clsDet}</td>
+      <td class="res-val">${t.diam.toFixed(1)}</td>
+      <td>${vol > 0 ? fmem(vol, 1) : "—"} ${t.cap && t.cap > 0 ? "" : "<em style='font-size:8pt;color:#888;'>(est.)</em>"}</td>
+    </tr>`;
+  });
+  html += `</table>
+  <div class="norm-ref">Classificação por ponto de fulgor conforme ABNT NBR 17505-1. Capacidade estimada quando não informada: Vol = π/4 × D² × D.</div>`;
+
+  // ── 3. Espaçamento entre Costados ──
+  html += `
+  <h2>3. ${isNTCBmt ? "Verificação do Afastamento entre Costados" : "Verificação do Espaçamento entre Costados"} (${getNormaLabel()} – ${isNTCBmt ? "§2.3.2.2 – Tab. 2.7" : "Tab. 2"})</h2>
+  <p>O espaçamento mínimo entre costados é calculado par a par, para todos os tanques do parque.</p>
+  <div class="formula">D_mín = ${fracLabel} × (D₁ + D₂)${fracMin}</div>`;
+
+  let temNokCostado = false;
+  let pairsHtml = `<table class="res-table">
+    <tr>
+      <th>Par</th><th>Classe TQ1</th><th>Classe TQ2</th>
+      <th>D₁ (m)</th><th>D₂ (m)</th><th>D₁+D₂ (m)</th>
+      <th>D_mín calc. (m)</th><th>Dist. Real (m)</th><th>Status</th>
+    </tr>`;
+
+  for(let i = 0; i < tanks.length; i++){
+    for(let j = i+1; j < tanks.length; j++){
+      const t1 = tanks[i], t2 = tanks[j];
+      const soma = t1.diam + t2.diam;
+      const dMin = Math.max(fracObj.frac * soma, fracObj.min);
+      const distKey = `${t1.tag}_${t2.tag}`;
+      const distReal = (t1.distReal && t1.distReal[distKey] !== undefined) ? t1.distReal[distKey] : "";
+      const isOk  = distReal !== "" && parseFloat(distReal) >= dMin;
+      const isNok = distReal !== "" && parseFloat(distReal) <  dMin;
+      if(isNok) temNokCostado = true;
+
+      const cls1 = t1.classe || classificarDetalhado(t1.pf);
+      const cls2 = t2.classe || classificarDetalhado(t2.pf);
+      const statusTxt = distReal === "" ? `<span class="status-nd">Não informado</span>`
+        : isOk ? `<span class="status-ok">✔ CONFORME</span>`
+                : `<span class="status-nok">✘ NÃO CONFORME</span>`;
+
+      pairsHtml += `<tr>
+        <td><strong>${t1.tag} × ${t2.tag}</strong></td>
+        <td>${cls1}</td><td>${cls2}</td>
+        <td>${t1.diam.toFixed(1)}</td><td>${t2.diam.toFixed(1)}</td>
+        <td><strong>${soma.toFixed(1)}</strong></td>
+        <td class="res-val">${dMin.toFixed(2)}</td>
+        <td>${distReal !== "" ? fmem(distReal, 2) : "—"}</td>
+        <td>${statusTxt}</td>
+      </tr>`;
+    }
+  }
+  pairsHtml += `</table>`;
+  html += pairsHtml;
+
+  if(temNokCostado){
+    html += `<div class="doc-nok">⚠ <strong>Atenção:</strong> um ou mais pares apresentam espaçamento real inferior ao mínimo calculado pela Tabela 2.7. Revisão do projeto é necessária.</div>`;
+  } else if(tanks.length >= 2){
+    html += `<div class="doc-ok">✔ Todos os pares verificados apresentam espaçamento conforme a Tabela 2 da ${getNormaLabel()}.</div>`;
+  }
+
+  // ── 4. Distâncias ao Entorno ──
+  html += `
+  <h2>4. Verificação das Distâncias ao Entorno (${getNormaLabel()} – ${isNTCBmt ? "§2.3.2.1 – " : ""}Tab. 2.1, 2.2, 2.6)</h2>
+  <p>Distâncias mínimas de cada tanque até o <strong>limite de propriedade</strong> e até <strong>vias de circulação internas / edificações na mesma propriedade</strong>.</p>`;
+
+  let temNokDist = false;
+  let distHtml = `<table class="res-table">
+    <tr>
+      <th>Tanque</th><th>Classe</th><th>Ø (m)</th><th>Cap. (m³)</th><th>Tabela</th>
+      <th>D_mín Limite (m)</th><th>Real Limite (m)</th><th>Status</th>
+      <th>D_mín Vias/Edif. (m)</th><th>Real Vias/Edif. (m)</th><th>Status</th>
+    </tr>`;
+
+  tanks.forEach(t => {
+    const clsDet = t.classe || classificarDetalhado(t.pf);
+    const vol = getCapacidade(t);
+    const mins = calcDistMinimas(t, tipoTetoDist, cbpmesp, pressao);
+    const dRealLim = t.distLimProp  !== undefined && t.distLimProp  !== "" ? t.distLimProp  : "";
+    const dRealVia = t.distViasEdif !== undefined && t.distViasEdif !== "" ? t.distViasEdif : "";
+    const okLim  = dRealLim !== "" && parseFloat(dRealLim) >= mins.limProp;
+    const nokLim = dRealLim !== "" && parseFloat(dRealLim) <  mins.limProp;
+    const okVia  = dRealVia !== "" && parseFloat(dRealVia) >= mins.viasEdif;
+    const nokVia = dRealVia !== "" && parseFloat(dRealVia) <  mins.viasEdif;
+    if(nokLim || nokVia) temNokDist = true;
+    const stLim = dRealLim === "" ? `<span class="status-nd">N/I</span>` : okLim ? `<span class="status-ok">✔</span>` : `<span class="status-nok">✘</span>`;
+    const stVia = dRealVia === "" ? `<span class="status-nd">N/I</span>` : okVia ? `<span class="status-ok">✔</span>` : `<span class="status-nok">✘</span>`;
+    distHtml += `<tr>
+      <td><strong>${t.tag}</strong></td>
+      <td>${clsDet}</td>
+      <td>${t.diam.toFixed(1)}</td>
+      <td>${vol > 0 ? fmem(vol,1) : "—"}</td>
+      <td style="font-size:8pt;">${mins.metodo}</td>
+      <td class="res-val">${mins.limProp.toFixed(1)}</td>
+      <td>${dRealLim !== "" ? fmem(dRealLim,2) : "—"}</td>
+      <td>${stLim}</td>
+      <td class="res-val">${mins.viasEdif.toFixed(1)}</td>
+      <td>${dRealVia !== "" ? fmem(dRealVia,2) : "—"}</td>
+      <td>${stVia}</td>
+    </tr>`;
+  });
+  distHtml += `</table>`;
+  html += distHtml;
+
+  if(temNokDist){
+    html += `<div class="doc-nok">⚠ <strong>Atenção:</strong> um ou mais tanques apresentam distâncias ao entorno inferiores aos mínimos normativos. Revisão do projeto é necessária.</div>`;
+  } else if(tanks.length > 0){
+    html += `<div class="doc-ok">✔ Todos os tanques com distâncias informadas apresentam conformidade com as tabelas normativas da ${getNormaLabel()}.</div>`;
+  }
+
+  // ── 5. Conclusão ──
+  const todosConformes = !temNokCostado && !temNokDist;
+  html += `
+  <h2>5. Conclusão</h2>`;
+
+  if(todosConformes){
+    html += `<div class="doc-ok">✔ <strong>CONFORME:</strong> Todos os espaçamentos entre costados e todas as distâncias ao entorno verificadas atendem aos requisitos mínimos estabelecidos pela ${getNormaLabel()}.</div>`;
+  } else {
+    html += `<div class="doc-nok">✘ <strong>NÃO CONFORME:</strong> Foram identificadas ${temNokCostado ? "inconformidades no espaçamento entre costados" : ""}${temNokCostado && temNokDist ? " e " : ""}${temNokDist ? "inconformidades nas distâncias ao entorno" : ""}. O projeto deverá ser revisado antes da submissão ao Corpo de Bombeiros competente.</div>`;
+  }
+
+  html += `<p>O presente memorial é parte integrante do projeto de prevenção e combate a incêndios, devendo ser apresentado ao Corpo de Bombeiros competente quando exigido, acompanhado dos demais documentos técnicos.</p>`;
+
+  if(obs){
+    html += `<div class="doc-obs"><strong>Observações do Responsável Técnico:</strong><br>${obs.replace(/\n/g,"<br>")}</div>`;
+  }
+
+  // ── Assinaturas ──
+  html += `
+  <div class="doc-assinatura">
+    <div class="doc-assin-bloco">
+      <div style="height:32px;"></div>
+      <div class="doc-assin-linha"></div>
+      <div><strong>${responsavel}</strong></div>
+      <div>${titulo} &nbsp;·&nbsp; ${crea}</div>
+    </div>
+    <div class="doc-assin-bloco">
+      <div style="height:32px;"></div>
+      <div class="doc-assin-linha"></div>
+      <div><strong>Cliente / Contratante</strong></div>
+      <div>${cliente}</div>
+    </div>
+  </div>
+  <div class="doc-footer">
+    <span>${docnum} · ${rev} · ${dataStr}</span>
+    <span>${getNormaLabel()}</span>
+    <span>Página 1 de 1</span>
+  </div>
+  <div class="watermark">${todosConformes ? "" : "REVISAR"}</div>`;
+
+  document.getElementById("mem-content").innerHTML = html;
+}
+
+
+// ══════════════════════════════════════════
+
+window.addEventListener("load", () => {
+  loadState();
+  renderDados();
+  atualizarDisplayNorma();
+  renderAll();
+  renderDistancias();
+  document.addEventListener('input', saveState);
+  document.addEventListener('change', saveState);
+});
+
+// ══════════════════════════════════════════
+
+
+
+
+</script>
+
+<!-- ══ MEMORIAL DE CÁLCULO – OVERLAY ══ -->
+<div class="mem-overlay" id="mem-overlay">
+
+  <!-- SIDEBAR -->
+  <div class="mem-sidebar">
+    <div class="mem-sidebar-title">📄 Dados do Documento</div>
+
+    <div class="mem-field-group">
+      <div class="mem-field-label">Escritório / Empresa</div>
+      <input class="mem-input" id="mf-escritorio" placeholder="Nome do escritório">
+    </div>
+    <div class="mem-field-group">
+      <div class="mem-field-label">Responsável Técnico</div>
+      <input class="mem-input" id="mf-responsavel" placeholder="Nome do RT">
+    </div>
+    <div class="mem-field-group">
+      <div class="mem-field-label">Título / Formação</div>
+      <input class="mem-input" id="mf-titulo" placeholder="Eng. de Segurança / Militar…">
+    </div>
+    <div class="mem-field-group">
+      <div class="mem-field-label">CREA / CAU / CFT</div>
+      <input class="mem-input" id="mf-crea" placeholder="CREA-SP 000000">
+    </div>
+    <hr class="mem-divider">
+    <div class="mem-field-group">
+      <div class="mem-field-label">Cliente / Empresa</div>
+      <input class="mem-input" id="mf-cliente" placeholder="Razão social">
+    </div>
+    <div class="mem-field-group">
+      <div class="mem-field-label">Instalação / Projeto</div>
+      <input class="mem-input" id="mf-projeto" placeholder="Nome da instalação">
+    </div>
+    <div class="mem-field-group">
+      <div class="mem-field-label">Localização</div>
+      <input class="mem-input" id="mf-local" placeholder="Município – Estado">
+    </div>
+    <hr class="mem-divider">
+    <div class="mem-field-group">
+      <div class="mem-field-label">Número do Documento</div>
+      <input class="mem-input" id="mf-docnum" placeholder="ESP-001">
+    </div>
+    <div class="mem-field-group">
+      <div class="mem-field-label">Revisão</div>
+      <input class="mem-input" id="mf-rev" placeholder="R00" value="R00">
+    </div>
+    <hr class="mem-divider">
+    <div class="mem-field-group">
+      <div class="mem-field-label">Observações</div>
+      <textarea class="mem-input mem-textarea" id="mf-obs" placeholder="Observações gerais, premissas adotadas…"></textarea>
+    </div>
+    <button class="mem-btn-update" onclick="gerarMemorial()">↺ Atualizar Memorial</button>
+    <button class="mem-btn-print" onclick="window.print()">🖨 Imprimir / Salvar PDF</button>
+  </div>
+
+  <!-- DOCUMENTO -->
+  <div class="mem-doc">
+    <div class="mem-close-bar">
+      <span>MEMORIAL DESCRITIVO – ESPAÇAMENTO DE TANQUES</span>
+      <button onclick="fecharMemorial()">✕ Fechar</button>
+    </div>
+    <div id="mem-content">
+      <div class="watermark">RASCUNHO</div>
+    </div>
+  </div>
+</div>
+
+<script id="embedded-state" type="application/json"></script>
+
+<script id="license-script">
+(function(){
+  const lockScreen = document.getElementById('lockScreen');
+  const unlockBtn  = document.getElementById('unlockBtn');
+  const keyInput   = document.getElementById('licenseKeyInput');
+  const lockError  = document.getElementById('lockError');
+
+  document.querySelectorAll('body > *:not(#lockScreen):not(script):not(style):not(link)').forEach(el => {
+    el.dataset.appEl = '1';
+    el.style.display = 'none';
+  });
+
+  function liberarSistema() {
+    document.querySelectorAll('[data-app-el]').forEach(el => { el.style.display = ''; });
+    lockScreen.style.display = 'none';
+  }
+
+  function gerarFingerprint() {
+    const parts = [
+      screen.width + 'x' + screen.height, screen.colorDepth,
+      Intl.DateTimeFormat().resolvedOptions().timeZone,
+      navigator.hardwareConcurrency || '', navigator.language
+    ];
+    let hash = 5381;
+    const str = parts.join('|');
+    for (let i = 0; i < str.length; i++)
+      hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
+    return (hash >>> 0).toString(16).padStart(8, '0');
+  }
+
+  async function validarLicenca(chave, ativar = false) {
+    const fp = gerarFingerprint();
+    const resp = await fetch('/api/validate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ licenseKey: chave, fingerprint: fp, ativar })
+    });
+    const data = await resp.json().catch(() => ({}));
+    return { ok: resp.ok && data.valid === true, erro: data.erro || null };
+  }
+
+  async function liberarLicenca() {
+    const chave = localStorage.getItem('licenseKey_checklist');
+    if (!chave) return;
+    if (!confirm('Isso vai liberar sua licença deste dispositivo.\nVocê precisará inserir a chave novamente.\n\nContinuar?')) return;
+    const btn = document.getElementById('btnLiberarLicenca');
+    if (btn) { btn.disabled = true; btn.textContent = 'Liberando...'; }
+    try {
+      const fp = gerarFingerprint();
+      const resp = await fetch('/api/release', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ licenseKey: chave, fingerprint: fp })
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (data.ok) { localStorage.removeItem('licenseKey_checklist'); location.reload(); }
+      else { alert('Não foi possível liberar. Tente novamente.'); if (btn) { btn.disabled = false; btn.textContent = '🔓 Liberar licença'; } }
+    } catch(e) {
+      alert('Erro de conexão. Tente novamente.');
+      if (btn) { btn.disabled = false; btn.textContent = '🔓 Liberar licença'; }
+    }
+  }
+
+  window.liberarLicenca = liberarLicenca;
+
+  async function tentarAcesso() {
+    const chave = keyInput.value.trim();
+    lockError.textContent = '';
+    if (!chave) { lockError.textContent = 'Digite uma chave válida.'; return; }
+    unlockBtn.disabled = true;
+    unlockBtn.textContent = 'Validando...';
+    try {
+      const { ok, erro } = await validarLicenca(chave, true);
+      if (ok) {
+        localStorage.setItem('licenseKey_checklist', chave);
+        liberarSistema();
+      } else {
+        lockError.textContent = erro === 'dispositivo_diferente'
+          ? 'Licença ativa em outro dispositivo. Libere-a de lá primeiro.'
+          : 'Chave inválida ou revogada.';
+        unlockBtn.disabled = false;
+        unlockBtn.textContent = 'Acessar Ferramenta';
+      }
+    } catch(e) {
+      lockError.textContent = 'Erro de conexão. Tente novamente.';
+      unlockBtn.disabled = false;
+      unlockBtn.textContent = 'Acessar Ferramenta';
+    }
+  }
+
+  unlockBtn.addEventListener('click', tentarAcesso);
+  keyInput.addEventListener('keydown', e => { if (e.key === 'Enter') tentarAcesso(); });
+
+  window.addEventListener('load', async () => {
+    const saved = localStorage.getItem('licenseKey_checklist');
+    if (!saved) return;
+    try {
+      const { ok } = await validarLicenca(saved, false);
+      if (ok) liberarSistema();
+      else localStorage.removeItem('licenseKey_checklist');
+    } catch(e) {}
+  });
+})();
+</script>
+</body>
+</html>

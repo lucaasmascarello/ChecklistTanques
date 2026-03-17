@@ -1,0 +1,18 @@
+{
+  "name": "checklist-distanciamentos-tanques",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Checklist de Distanciamentos entre Tanques – NBR 17505-2:2024 / IT 25/2025",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.31.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "vercel": "^37.0.0"
+  }
+}
