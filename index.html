@@ -318,7 +318,7 @@ input.pf-readonly:focus{border-color:#d0d8e4!important;box-shadow:none!important
     <div id="lockError"></div>
     <div class="lock-footer">
       Chave pessoal e intransferível.<br>
-      Suporte: <a href="mailto:lucasmascarello.eng@gmail.com" style="color:#8a9ab5;">lucasmascarello.eng@gmail.com</a>
+      Suporte: <a href="/cdn-cgi/l/email-protection#7c10091f1d0f111d0f1f1d0e191010135219121b3c1b111d1510521f1311" style="color:#8a9ab5;"><span class="__cf_email__" data-cfemail="90fce5f3f1e3fdf1e3f3f1e2f5fcfcffbef5fef7d0f7fdf1f9fcbef3fffd">[email&#160;protected]</span></a>
     </div>
   </div>
 </div>
@@ -840,7 +840,7 @@ input.pf-readonly:focus{border-color:#d0d8e4!important;box-shadow:none!important
   <span style="font-size:11px;color:rgba(255,255,255,0.2);" id="footer-norma-2">NBR 17505-2 · Tabela 2</span>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 
 
 
@@ -2474,6 +2474,8 @@ window.addEventListener("load", () => {
       } else {
         lockError.textContent = erro === 'dispositivo_diferente'
           ? 'Licença ativa em outro dispositivo. Libere-a de lá primeiro.'
+          : erro === 'chave_outra_ferramenta'
+          ? 'Esta chave pertence a outra ferramenta. Use a chave correta para o Checklist.'
           : 'Chave inválida ou revogada.';
         unlockBtn.disabled = false;
         unlockBtn.textContent = 'Acessar Ferramenta';
@@ -2489,15 +2491,4 @@ window.addEventListener("load", () => {
   keyInput.addEventListener('keydown', e => { if (e.key === 'Enter') tentarAcesso(); });
 
   window.addEventListener('load', async () => {
-    const saved = localStorage.getItem('licenseKey_checklist');
-    if (!saved) return;
-    try {
-      const { ok } = await validarLicenca(saved, false);
-      if (ok) liberarSistema();
-      else localStorage.removeItem('licenseKey_checklist');
-    } catch(e) {}
-  });
-})();
-</script>
-</body>
-</html>
+    const saved = localStorage.getItem('
