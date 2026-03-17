@@ -1,10 +1,7 @@
 const { Redis } = require("@upstash/redis");
 const { v4: uuidv4 } = require("uuid");
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-  token: process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN,
-});
+
 
 const TEST_EMAIL = "lucasmascarello.eng@gmail.com";
 
@@ -55,6 +52,10 @@ async function sendLicenseEmail(email, nome, chave, isTest = false) {
 }
 
 module.exports = async function handler(req, res) {
+  const redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
+    token: process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN,
+  });
   if (req.method !== "POST") {
     return res.status(405).send("Método não permitido");
   }
