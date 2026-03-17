@@ -1,5 +1,5 @@
-import { Redis } from "@upstash/redis";
-import { v4 as uuidv4 } from "uuid";
+const { Redis } = require("@upstash/redis");
+const { v4: uuidv4 } = require("uuid");
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
@@ -54,7 +54,7 @@ async function sendLicenseEmail(email, nome, chave, isTest = false) {
   });
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).send("Método não permitido");
   }
