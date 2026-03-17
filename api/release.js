@@ -1,11 +1,12 @@
 const { Redis } = require("@upstash/redis");
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-  token: process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN,
-});
+
 
 module.exports = async function handler(req, res) {
+  const redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
+    token: process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN,
+  });
   if (req.method !== "POST") {
     return res.status(405).send("Método não permitido");
   }
