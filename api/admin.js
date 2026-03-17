@@ -1,5 +1,5 @@
-import { Redis } from "@upstash/redis";
-import { v4 as uuidv4 } from "uuid";
+const { Redis } = require("@upstash/redis");
+const { v4: uuidv4 } = require("uuid");
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
@@ -13,7 +13,7 @@ function isAuthorized(req) {
   return token === process.env.ADMIN_TOKEN;
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (!isAuthorized(req)) {
     return res.status(401).json({ ok: false, erro: "não_autorizado" });
   }
