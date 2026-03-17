@@ -1,15 +1,20 @@
 const { Redis } = require("@upstash/redis");
 const { v4: uuidv4 } = require("uuid");
 
-
-
 const TEST_EMAIL = "lucasmascarello.eng@gmail.com";
 
-// Detecta transações de teste da Hotmart:
-// 1. TEST_MODE=true no Vercel — força modo teste manualmente
-// 2. transactionId começa com "HP" — padrão real do painel de testes da Hotmart
-// 3. transactionId começa com "TEST" — prefixo alternativo
-// 4. E-mail @example.com — e-mails fictícios gerados pelo painel de testes
+// Mapeia nome do produto Hotmart → identificador da ferramenta
+function identificarFerramenta(nomeProduto = "") {
+  const nome = nomeProduto.toLowerCase();
+  if (nome.includes("checklist") || nome.includes("distanciamento") || nome.includes("tanques")) {
+    return "checklist";
+  }
+  if (nome.includes("calculadora") || nome.includes("ppci") || nome.includes("nr-20") || nome.includes("nr20")) {
+    return "calculadora";
+  }
+  return "desconhecida";
+}
+
 function isTestTransaction(transactionId = "", email = "") {
   if (process.env.TEST_MODE === "true") return true;
   const tid = transactionId.toUpperCase();
@@ -18,9 +23,23 @@ function isTestTransaction(transactionId = "", email = "") {
   return false;
 }
 
-async function sendLicenseEmail(email, nome, chave, isTest = false) {
+const FERRAMENTAS_CONFIG = {
+  checklist: {
+    nome: "Checklist de Distanciamentos de Tanques",
+    url: "https://checklist-tanques.vercel.app",
+    cor: "#C41E1E",
+  },
+  calculadora: {
+    nome: "Calculadora PPCI Industrial",
+    url: "https://calculadora-ppci.vercel.app",
+    cor: "#1A3C8F",
+  },
+};
+
+async function sendLicenseEmail(email, nome, chave, ferramenta, isTest = false) {
   const destinatario = isTest ? TEST_EMAIL : email;
   const subjectPrefix = isTest ? "[TESTE] " : "";
+  const config = FERRAMENTAS_CONFIG[ferramenta] || FERRAMENTAS_CONFIG["checklist"];
 
   await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -31,17 +50,17 @@ async function sendLicenseEmail(email, nome, chave, isTest = false) {
     body: JSON.stringify({
       from: "Mascarello Engenharia <onboarding@resend.dev>",
       to: destinatario,
-      subject: `${subjectPrefix}Sua chave de acesso — Bacia de Contenção de Tanques V/H`,
+      subject: `${subjectPrefix}Sua chave de acesso — ${config.nome}`,
       html: `
         <div style="font-family:sans-serif;max-width:520px;margin:auto">
-          ${isTest ? `<div style="background:#fffbe6;border:1px solid #f0c000;padding:8px 12px;border-radius:6px;margin-bottom:16px;font-size:13px;color:#7a5f00">⚠️ <strong>Modo teste</strong> — e-mail original do comprador: <code>${email}</code></div>` : ""}
-          <h2 style="color:#C41E1E">Checklist de Distanciamentos de Tanques</h2>
+          ${isTest ? `<div style="background:#fffbe6;border:1px solid #f0c000;padding:8px 12px;border-radius:6px;margin-bottom:16px;font-size:13px;color:#7a5f00">⚠️ <strong>Modo teste</strong> — e-mail original do comprador: <code>${email}</code> — ferramenta: <strong>${ferramenta}</strong></div>` : ""}
+          <h2 style="color:${config.cor}">${config.nome}</h2>
           <p>Olá, <strong>${nome}</strong>!</p>
           <p>Sua compra foi confirmada. Use a chave abaixo para acessar o sistema:</p>
           <div style="background:#f4f4f4;padding:16px;border-radius:8px;text-align:center;font-size:20px;letter-spacing:2px;font-weight:bold;color:#1A1A1A">
             ${chave}
           </div>
-          <p style="margin-top:24px;color:#555">Acesse o sistema em: <a href="https://checklist-distanciamentos.vercel.app">checklist-distanciamentos.vercel.app</a></p>
+          <p style="margin-top:24px;color:#555">Acesse o sistema em: <a href="${config.url}">${config.url}</a></p>
           <p style="color:#555">Guarde esta chave. Ela é pessoal e intransferível.</p>
           <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
           <p style="font-size:12px;color:#999">Mascarello Engenharia · CREA-SC 221902-8</p>
@@ -56,6 +75,7 @@ module.exports = async function handler(req, res) {
     url: process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
     token: process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN,
   });
+
   if (req.method !== "POST") {
     return res.status(405).send("Método não permitido");
   }
@@ -69,14 +89,14 @@ module.exports = async function handler(req, res) {
   const email = data?.buyer?.email;
   const nome = data?.buyer?.name || "Cliente";
   const transactionId = data?.purchase?.transaction;
+  const nomeProduto = data?.product?.name || "";
+  const ferramenta = identificarFerramenta(nomeProduto);
 
   if (!email || !transactionId) {
     return res.status(400).json({ ok: false, erro: "Dados do comprador ausentes" });
   }
 
-  // Compra aprovada: gera e salva chave
   if (event === "PURCHASE_APPROVED" || event === "PURCHASE_COMPLETE") {
-    // Evita duplicar licença se o webhook disparar duas vezes
     const chaveExistente = await redis.get(`transacao:${transactionId}`);
     if (chaveExistente) {
       console.log(`Licença já existe para transação ${transactionId}: ${chaveExistente}`);
@@ -88,25 +108,23 @@ module.exports = async function handler(req, res) {
       email,
       nome,
       transactionId,
+      ferramenta,
       status: "active",
       criadoEm: new Date().toISOString(),
     }));
-    // Índice reverso para busca por transação
     await redis.set(`transacao:${transactionId}`, chave);
 
     const isTest = isTestTransaction(transactionId, email);
     try {
-      await sendLicenseEmail(email, nome, chave, isTest);
+      await sendLicenseEmail(email, nome, chave, ferramenta, isTest);
     } catch (emailErr) {
       console.error("Erro ao enviar e-mail:", emailErr.message);
-      // Não falha o webhook por causa do e-mail
     }
 
-    console.log(`Licença criada: ${chave} para ${email}`);
-    return res.status(200).json({ ok: true, acao: "licenca_criada" });
+    console.log(`Licença criada: ${chave} para ${email} — ferramenta: ${ferramenta}`);
+    return res.status(200).json({ ok: true, acao: "licenca_criada", ferramenta });
   }
 
-  // Reembolso ou chargeback: revoga chave
   if (
     event === "PURCHASE_REFUNDED" ||
     event === "PURCHASE_CHARGEBACK" ||
@@ -127,7 +145,6 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true, acao: "licenca_revogada" });
   }
 
-  // Outros eventos: apenas confirma recebimento
   console.log(`Evento ignorado: ${event}`);
   return res.status(200).json({ ok: true, acao: "ignorado" });
 }
