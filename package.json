@@ -2,7 +2,6 @@
   "name": "checklist-distanciamentos-tanques",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "description": "Checklist de Distanciamentos entre Tanques – NBR 17505-2:2024 / IT 25/2025",
   "scripts": {
     "dev": "vercel dev"
