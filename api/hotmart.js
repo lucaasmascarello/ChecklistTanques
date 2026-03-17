@@ -4,7 +4,18 @@ const { v4: uuidv4 } = require("uuid");
 const TEST_EMAIL = "lucasmascarello.eng@gmail.com";
 
 // Mapeia nome do produto Hotmart → identificador da ferramenta
-function identificarFerramenta(nomeProduto = "") {
+// Mapa de IDs de produto Hotmart → ferramenta
+const PRODUTO_ID_MAP = {
+  "7403112": "checklist",   // Checklist de Distanciamento entre Tanques - NBR 17505
+  "7370938": "calculadora", // Calculadora PPCI Industrial — NBR 17505 / NR-20
+};
+
+function identificarFerramenta(nomeProduto = "", productId = "") {
+  // 1. Prioridade: ID do produto (mais confiável)
+  if (productId && PRODUTO_ID_MAP[String(productId)]) {
+    return PRODUTO_ID_MAP[String(productId)];
+  }
+  // 2. Fallback: nome do produto
   const nome = nomeProduto.toLowerCase();
   if (nome.includes("checklist") || nome.includes("distanciamento") || nome.includes("tanques")) {
     return "checklist";
@@ -12,7 +23,8 @@ function identificarFerramenta(nomeProduto = "") {
   if (nome.includes("calculadora") || nome.includes("ppci") || nome.includes("nr-20") || nome.includes("nr20")) {
     return "calculadora";
   }
-  return "desconhecida";
+  // 3. Produto de teste → checklist por padrão
+  return "checklist";
 }
 
 function isTestTransaction(transactionId = "", email = "") {
@@ -90,7 +102,8 @@ module.exports = async function handler(req, res) {
   const nome = data?.buyer?.name || "Cliente";
   const transactionId = data?.purchase?.transaction;
   const nomeProduto = data?.product?.name || "";
-  const ferramenta = identificarFerramenta(nomeProduto);
+  const productId = data?.product?.id || "";
+  const ferramenta = identificarFerramenta(nomeProduto, productId);
 
   if (!email || !transactionId) {
     return res.status(400).json({ ok: false, erro: "Dados do comprador ausentes" });
